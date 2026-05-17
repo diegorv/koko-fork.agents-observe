@@ -1,12 +1,13 @@
 # koko-fork-agents-observe
 
-Real-time observability dashboard for Claude Code agents.
+> ⚠️ **Personal fork — not intended for general use.**
+> This is a fork of **[`simple10/agents-observe`](https://github.com/simple10/agents-observe)** by [@simple10](https://github.com/simple10) (Joe Johnston).
+> All of the original design, dashboard, hook taxonomy, server architecture, and tests are his work — full credit to the upstream project.
+> This fork exists only to host my own personal modifications (mainly security hardening for running on shared networks). If you don't specifically need those changes, **use the upstream project instead**: <https://github.com/simple10/agents-observe>.
+>
+> See [What this fork changes](#what-this-fork-changes) for the full diff vs upstream.
 
-> **This is a hardened fork of [`simple10/agents-observe`](https://github.com/simple10/agents-observe).**
-> Full credit for the original design, dashboard, hook taxonomy, and server architecture goes to [@simple10](https://github.com/simple10) (Joe Johnston).
-> This fork only adds security hardening for personal use — see [What this fork changes](#what-this-fork-changes) below.
-
-Includes powerful filtering, searching, and visualization of multi-agent sessions.
+Real-time observability dashboard for Claude Code agents. Includes powerful filtering, searching, and visualization of multi-agent sessions.
 
 <p align="center">
   <a href="https://raw.githubusercontent.com/simple10/agents-observe/videos/docs/assets/dashboard.gif">
