@@ -13,6 +13,31 @@ function parseAgentClasses(raw: unknown): string[] {
   return raw.split(',').filter(Boolean)
 }
 
+/** Hard cap on `?limit=` for any list endpoint. Above this the request
+ *  has no useful UX intent and risks loading the world into memory. */
+export const MAX_LIST_LIMIT = 500
+
+/** Parse a positive-integer query parameter. Returns:
+ *   - { ok: true, value } when valid (or falls back to `defaultValue` if raw is undefined),
+ *   - { ok: false, reason } otherwise.
+ *  `max` caps the value to MAX_LIST_LIMIT by default. */
+export function parsePositiveIntParam(
+  raw: string | undefined,
+  paramName: string,
+  opts: { defaultValue?: number; max?: number } = {},
+): { ok: true; value: number | undefined } | { ok: false; reason: string } {
+  if (raw === undefined || raw === '') {
+    return { ok: true, value: opts.defaultValue }
+  }
+  const n = Number(raw)
+  if (!Number.isInteger(n) || n < 0) {
+    return { ok: false, reason: `${paramName} must be a non-negative integer` }
+  }
+  const max = opts.max ?? MAX_LIST_LIMIT
+  if (n > max) return { ok: true, value: max }
+  return { ok: true, value: n }
+}
+
 /** Parse a JSON column without throwing. A corrupt row used to crash the
  *  entire list endpoint; now it returns null and logs once so the row id
  *  is traceable. */
@@ -63,8 +88,9 @@ function rowToRecentSession(r: any) {
 // GET /sessions/recent
 router.get('/sessions/recent', async (c) => {
   const store = c.get('store')
-  const limit = c.req.query('limit') ? parseInt(c.req.query('limit')!) : 20
-  const rows = await store.getRecentSessions(limit)
+  const parsed = parsePositiveIntParam(c.req.query('limit'), 'limit', { defaultValue: 20 })
+  if (!parsed.ok) return apiError(c, 400, parsed.reason)
+  const rows = await store.getRecentSessions(parsed.value ?? 20)
   return c.json(rows.map(rowToRecentSession))
 })
 
@@ -74,8 +100,9 @@ router.get('/sessions/recent', async (c) => {
 // immediately throw away.
 router.get('/sessions/unassigned', async (c) => {
   const store = c.get('store')
-  const limit = c.req.query('limit') ? parseInt(c.req.query('limit')!) : 100
-  const rows = await store.getUnassignedSessions(limit)
+  const parsed = parsePositiveIntParam(c.req.query('limit'), 'limit', { defaultValue: 100 })
+  if (!parsed.ok) return apiError(c, 400, parsed.reason)
+  const rows = await store.getUnassignedSessions(parsed.value ?? 100)
   return c.json(rows.map(rowToRecentSession))
 })
 
@@ -138,15 +165,31 @@ router.get('/sessions/:id/events', async (c) => {
       .filter((f) => OPT_IN_FIELDS.has(f)),
   )
 
-  const rows = sinceParam
-    ? await store.getEventsSince(sessionId, parseInt(sinceParam))
-    : await store.getEventsForSession(sessionId, {
-        agentIds: agentIdParam ? agentIdParam.split(',') : undefined,
-        hookName: c.req.query('hookName') || undefined,
-        search: c.req.query('search') || undefined,
-        limit: c.req.query('limit') ? parseInt(c.req.query('limit')!) : undefined,
-        offset: c.req.query('offset') ? parseInt(c.req.query('offset')!) : undefined,
-      })
+  let rows
+  if (sinceParam !== undefined) {
+    // `since` has no sensible upper bound — it is a millisecond timestamp,
+    // not a row limit — so we validate it as a non-negative integer with no
+    // cap. Allow the natural Number.MAX_SAFE_INTEGER ceiling.
+    const sinceParsed = parsePositiveIntParam(sinceParam, 'since', {
+      max: Number.MAX_SAFE_INTEGER,
+    })
+    if (!sinceParsed.ok) return apiError(c, 400, sinceParsed.reason)
+    rows = await store.getEventsSince(sessionId, sinceParsed.value ?? 0)
+  } else {
+    const limitParsed = parsePositiveIntParam(c.req.query('limit'), 'limit')
+    if (!limitParsed.ok) return apiError(c, 400, limitParsed.reason)
+    const offsetParsed = parsePositiveIntParam(c.req.query('offset'), 'offset', {
+      max: Number.MAX_SAFE_INTEGER,
+    })
+    if (!offsetParsed.ok) return apiError(c, 400, offsetParsed.reason)
+    rows = await store.getEventsForSession(sessionId, {
+      agentIds: agentIdParam ? agentIdParam.split(',') : undefined,
+      hookName: c.req.query('hookName') || undefined,
+      search: c.req.query('search') || undefined,
+      limit: limitParsed.value,
+      offset: offsetParsed.value,
+    })
+  }
 
   interface EventRow {
     id: number

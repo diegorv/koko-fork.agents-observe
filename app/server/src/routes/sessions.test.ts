@@ -1,7 +1,62 @@
 import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest'
 import { Hono } from 'hono'
 import type { EventStore } from '../storage/types'
-import { safeParseJson } from './sessions'
+import { safeParseJson, parsePositiveIntParam, MAX_LIST_LIMIT } from './sessions'
+
+describe('parsePositiveIntParam', () => {
+  test('returns defaultValue when raw is undefined', () => {
+    expect(parsePositiveIntParam(undefined, 'limit', { defaultValue: 20 })).toEqual({
+      ok: true,
+      value: 20,
+    })
+  })
+
+  test('returns defaultValue when raw is empty string', () => {
+    expect(parsePositiveIntParam('', 'limit', { defaultValue: 20 })).toEqual({
+      ok: true,
+      value: 20,
+    })
+  })
+
+  test('parses a valid integer', () => {
+    expect(parsePositiveIntParam('42', 'limit')).toEqual({ ok: true, value: 42 })
+  })
+
+  test('rejects NaN-yielding input', () => {
+    expect(parsePositiveIntParam('abc', 'limit')).toEqual({
+      ok: false,
+      reason: 'limit must be a non-negative integer',
+    })
+  })
+
+  test('rejects negative integers', () => {
+    expect(parsePositiveIntParam('-1', 'offset')).toEqual({
+      ok: false,
+      reason: 'offset must be a non-negative integer',
+    })
+  })
+
+  test('rejects floats', () => {
+    expect(parsePositiveIntParam('1.5', 'limit')).toEqual({
+      ok: false,
+      reason: 'limit must be a non-negative integer',
+    })
+  })
+
+  test('caps a too-large value at MAX_LIST_LIMIT', () => {
+    expect(parsePositiveIntParam('999999', 'limit')).toEqual({
+      ok: true,
+      value: MAX_LIST_LIMIT,
+    })
+  })
+
+  test('respects a custom max', () => {
+    expect(parsePositiveIntParam('999999', 'since', { max: Number.MAX_SAFE_INTEGER })).toEqual({
+      ok: true,
+      value: 999999,
+    })
+  })
+})
 
 describe('safeParseJson', () => {
   afterEach(() => {
@@ -246,6 +301,37 @@ describe('GET /api/sessions/:id/events — fields= allow-list', () => {
         _meta: { foo: 'bar' },
       },
     ])
+  })
+
+  test('rejects ?limit=abc with 400', async () => {
+    const res = await app.request('/api/sessions/sess-1/events?limit=abc')
+    expect(res.status).toBe(400)
+    const body = (await res.json()) as { error: { message: string } }
+    expect(body.error.message).toMatch(/limit must be a non-negative integer/)
+  })
+
+  test('rejects ?since=abc with 400', async () => {
+    const res = await app.request('/api/sessions/sess-1/events?since=abc')
+    expect(res.status).toBe(400)
+    const body = (await res.json()) as { error: { message: string } }
+    expect(body.error.message).toMatch(/since must be a non-negative integer/)
+  })
+
+  test('rejects ?offset=-5 with 400', async () => {
+    const res = await app.request('/api/sessions/sess-1/events?offset=-5')
+    expect(res.status).toBe(400)
+  })
+
+  test('caps a runaway ?limit= to MAX_LIST_LIMIT instead of unbounded read', async () => {
+    mockStore.getEventsForSession.mockResolvedValue([])
+    mockStore.getSessionById.mockResolvedValue({ stopped_at: null })
+
+    const res = await app.request('/api/sessions/sess-1/events?limit=999999')
+    expect(res.status).toBe(200)
+    expect(mockStore.getEventsForSession).toHaveBeenCalledWith(
+      'sess-1',
+      expect.objectContaining({ limit: MAX_LIST_LIMIT }),
+    )
   })
 
   test('corrupt payload JSON does not crash the endpoint (returns null payload)', async () => {
