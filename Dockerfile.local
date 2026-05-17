@@ -2,14 +2,13 @@
 # Use this instead of the upstream ghcr.io/simple10/agents-observe image.
 #
 # Differences vs upstream Dockerfile:
-#   - Base image pinned by digest (no silent "latest patch" drift)
+#   - Base image tag pinned to a specific Node patch release (no "slim" drift)
 #   - npm ci (strict lockfile) instead of npm install
 #   - apt --no-install-recommends + cache clean
-#   - Server TypeScript pre-compiled to JavaScript; production runs `node dist/index.js`
-#     (no `tsx` interpreter in prod, no devDependencies, no source watching)
-#   - Production node_modules pruned to runtime-only deps
 #   - Non-root user (UID 1000 / `node`) at runtime
 #   - HEALTHCHECK against /api/health
+#   - Runtime still uses `tsx` (matches upstream source layout, which has
+#     extensionless ESM imports that strict node ESM rejects)
 #
 # Build:
 #   docker build -f Dockerfile.local -t agents-observe:local .
