@@ -97,7 +97,7 @@ export const EventRow = memo(function EventRow({
         {showAgentLabel && (
           <div
             className={cn(
-              'text-[10px] opacity-90 dark:opacity-60 leading-tight',
+              'text-2xs opacity-90 dark:opacity-60 leading-tight',
               agentColors.textOnly,
             )}
           >
@@ -123,7 +123,7 @@ export const EventRow = memo(function EventRow({
 
           {/* Label (framework-owned) */}
           <span
-            className="text-xs font-medium w-16 shrink-0 truncate text-muted-foreground"
+            className="text-xs w-16 shrink-0 truncate text-muted-foreground"
             title={event.labelTooltip ?? event.hookName}
           >
             {event.label}
@@ -156,7 +156,7 @@ export const EventRow = memo(function EventRow({
 
           {/* Agent class icon + timestamp (framework-owned) */}
           <span
-            className="flex items-center gap-1 text-[10px] text-muted-foreground/80 dark:text-muted-foreground/60 tabular-nums shrink-0"
+            className="flex items-center gap-1 text-2xs text-muted-foreground/80 dark:text-muted-foreground/60 tabular-nums shrink-0"
             onMouseEnter={(e) =>
               showTimestampTooltip(event.timestamp, e.currentTarget.getBoundingClientRect())
             }

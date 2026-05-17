@@ -177,7 +177,7 @@ const LogsRow = memo(function LogsRow({
         {toolName && (
           <span className="text-xs font-mono text-blue-700 dark:text-blue-400">{toolName}</span>
         )}
-        <span className="text-[10px] text-muted-foreground/70 dark:text-muted-foreground/50 tabular-nums ml-auto">
+        <span className="text-2xs text-muted-foreground/70 dark:text-muted-foreground/50 tabular-nums ml-auto">
           {timeStr}
         </span>
         <button
@@ -191,7 +191,7 @@ const LogsRow = memo(function LogsRow({
       <pre
         ref={setPreRef}
         className={cn(
-          'text-[10px] font-mono leading-relaxed text-muted-foreground',
+          'text-2xs font-mono leading-relaxed text-muted-foreground',
           'overflow-x-auto max-h-60 overflow-y-auto',
           'rounded bg-muted/40 p-2',
           hasMatch && 'ring-1 ring-yellow-500/40',

@@ -246,7 +246,7 @@ export const TimelineRewind = memo(function TimelineRewind({
               {/* Sticky agent label */}
               <button
                 className={cn(
-                  'sticky left-0 z-10 bg-background w-40 shrink-0 text-[10px] truncate px-2 text-left cursor-pointer hover:underline border-r border-border/30',
+                  'sticky left-0 z-10 bg-background w-40 shrink-0 text-2xs truncate px-2 text-left cursor-pointer hover:underline border-r border-border/30',
                   color,
                   isSubagent ? 'opacity-80 dark:opacity-50' : 'opacity-100 dark:opacity-70',
                 )}

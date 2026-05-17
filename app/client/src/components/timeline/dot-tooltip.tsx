@@ -25,10 +25,10 @@ export function DotTooltipContent({ event }: { event: EnrichedEvent }) {
     <>
       <div className="flex items-baseline gap-2">
         <span className="font-medium">{event.label}</span>
-        {hookLine && <span className="ml-auto text-[10px] font-normal opacity-70">{hookLine}</span>}
+        {hookLine && <span className="ml-auto text-2xs font-normal opacity-70">{hookLine}</span>}
       </div>
       {event.summary && <div className="opacity-80 truncate">{event.summary}</div>}
-      <div className="text-[10px] font-medium tabular-nums mt-0.5">
+      <div className="text-2xs font-medium tabular-nums mt-0.5">
         {time} <span className="opacity-80">({relative})</span>
       </div>
     </>

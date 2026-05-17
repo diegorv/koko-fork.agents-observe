@@ -68,7 +68,7 @@ export function DefaultRowSummary({ event }: { event: EnrichedEvent; dataApi: Fr
 
 export function DefaultEventDetail({ event }: { event: EnrichedEvent; dataApi: FrameworkDataApi }) {
   return (
-    <pre className="overflow-x-auto rounded bg-muted/50 p-2 font-mono text-[10px] leading-relaxed max-h-60 overflow-y-auto">
+    <pre className="overflow-x-auto rounded bg-muted/50 p-2 font-mono text-2xs leading-relaxed max-h-60 overflow-y-auto">
       {JSON.stringify(event.payload, null, 2)}
     </pre>
   )

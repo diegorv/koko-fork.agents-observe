@@ -89,7 +89,7 @@ export function AgentCombobox() {
               <span className="text-green-600 dark:text-green-400">{activeCount} active</span>
             )}
             {selectedAgentIds.length > 0 && (
-              <Badge variant="secondary" className="text-[10px] h-4 px-1 ml-0.5">
+              <Badge variant="secondary" className="text-2xs h-4 px-1 ml-0.5">
                 {selectedAgentIds.length} selected
               </Badge>
             )}
@@ -174,7 +174,7 @@ export function AgentCombobox() {
                           const showCwd = !isMain && !!agent.cwd
                           const className = agentClassDisplayName(agent.agentClass)
                           return (
-                            <div className="flex items-center gap-0 text-[10px] text-muted-foreground/50 min-w-0">
+                            <div className="flex items-center gap-0 text-2xs text-muted-foreground/50 min-w-0">
                               <span className="shrink-0">{className}</span>
                               {(showDesc || showType) && <span className="shrink-0 mx-1">-</span>}
                               {showDesc && <span className="truncate">{agent.description}</span>}
@@ -193,10 +193,10 @@ export function AgentCombobox() {
                           )
                         })()}
                       </div>
-                      <div className="flex items-center gap-2 shrink-0 text-[10px] text-muted-foreground">
+                      <div className="flex items-center gap-2 shrink-0 text-2xs text-muted-foreground">
                         <span>{formatStartTime(agent.firstEventAt ?? 0)}</span>
                         <span>{formatRuntime(agent)}</span>
-                        <Badge variant="outline" className="text-[9px] h-3.5 px-1">
+                        <Badge variant="outline" className="text-2xs h-3.5 px-1">
                           {agent.eventCount}
                         </Badge>
                         <button

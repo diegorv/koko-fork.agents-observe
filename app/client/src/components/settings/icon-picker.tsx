@@ -108,7 +108,7 @@ export function IconPicker({
             })}
           </div>
           {filtered.length > MAX_VISIBLE && (
-            <p className="py-2 text-center text-[10px] text-muted-foreground">
+            <p className="py-2 text-center text-2xs text-muted-foreground">
               Showing {MAX_VISIBLE} of {filtered.length} — refine your search
             </p>
           )}

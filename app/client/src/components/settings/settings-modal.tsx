@@ -149,7 +149,7 @@ export function SettingsModal() {
           </TabsContent>
         </Tabs>
         {serverInfo && (
-          <div className="px-6 py-3 border-t text-[11px] text-muted-foreground/60 flex items-center gap-1.5">
+          <div className="px-6 py-3 border-t text-2xs text-muted-foreground/60 flex items-center gap-1.5">
             {serverInfo.runtime === 'docker' ? (
               <Container className="h-3 w-3 shrink-0" />
             ) : (

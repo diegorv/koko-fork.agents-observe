@@ -210,10 +210,7 @@ export function LabelList({ collapsed }: LabelListProps) {
                 )}
                 <Tag className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
                 <span className="truncate">{label.name}</span>
-                <Badge
-                  variant="secondary"
-                  className="ml-auto text-[10px] h-4 px-1 group-hover:hidden"
-                >
+                <Badge variant="secondary" className="ml-auto text-2xs h-4 px-1 group-hover:hidden">
                   {count}
                 </Badge>
                 {/* Hover affordance mirrors ProjectList's "Edit" pill.
@@ -221,7 +218,7 @@ export function LabelList({ collapsed }: LabelListProps) {
                     specific label so the user can rename or delete. */}
                 <span
                   data-testid={`edit-label-${label.id}`}
-                  className="ml-auto hidden group-hover:flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-yellow-500/20 text-yellow-600 dark:text-yellow-400 hover:bg-yellow-500/30 text-[10px] cursor-pointer transition-colors"
+                  className="ml-auto hidden group-hover:flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-yellow-500/20 text-yellow-600 dark:text-yellow-400 hover:bg-yellow-500/30 text-2xs cursor-pointer transition-colors"
                   onClick={(e) => {
                     e.stopPropagation()
                     openLabelsModal(label.id)
@@ -291,14 +288,14 @@ function LabelSessionList({ label, sessions }: { label: Label; sessions: RecentS
         return (
           <div key={group.label} className={groupIndex > 0 ? 'mt-3' : ''}>
             <div className="flex items-center px-2 pt-0 pb-0.5 select-none">
-              <span className="text-[10px] uppercase tracking-wider text-muted-foreground/50 dark:text-muted-foreground/30">
+              <span className="text-2xs uppercase tracking-wider text-muted-foreground/50 dark:text-muted-foreground/30">
                 {group.label}
               </span>
               {groupIndex === 0 && (
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <button
-                      className="flex items-center gap-1 ml-auto text-[10px] text-muted-foreground hover:text-foreground cursor-pointer"
+                      className="flex items-center gap-1 ml-auto text-2xs text-muted-foreground hover:text-foreground cursor-pointer"
                       onClick={() =>
                         setSessionSortOrder(
                           sessionSortOrder === 'activity' ? 'created' : 'activity',
@@ -358,7 +355,7 @@ function LabelSessionList({ label, sessions }: { label: Label; sessions: RecentS
             })}
             {hiddenCount > 0 && (
               <button
-                className="w-full text-[10px] text-muted-foreground hover:text-foreground px-2 py-1 cursor-pointer"
+                className="w-full text-2xs text-muted-foreground hover:text-foreground px-2 py-1 cursor-pointer"
                 onClick={() => toggleGroup(group.label)}
               >
                 Show {hiddenCount} more...
@@ -368,7 +365,7 @@ function LabelSessionList({ label, sessions }: { label: Label; sessions: RecentS
               expandedGroups.has(group.label) &&
               group.sessions.length > previewCount && (
                 <button
-                  className="w-full text-[10px] text-muted-foreground hover:text-foreground px-2 py-1 cursor-pointer"
+                  className="w-full text-2xs text-muted-foreground hover:text-foreground px-2 py-1 cursor-pointer"
                   onClick={() => toggleGroup(group.label)}
                 >
                   Show less

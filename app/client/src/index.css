@@ -28,6 +28,7 @@
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
   --text-xs: 0.82rem;
+  --text-2xs: 0.7rem;
 }
 
 :root {

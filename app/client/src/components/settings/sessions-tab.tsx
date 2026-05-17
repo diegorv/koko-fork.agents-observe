@@ -494,7 +494,7 @@ export function SessionsTab() {
 function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex flex-col">
-      <span className="text-[11px] uppercase tracking-wide text-muted-foreground">{label}</span>
+      <span className="text-2xs uppercase tracking-wide text-muted-foreground">{label}</span>
       <span className="text-sm font-semibold tabular-nums">{value}</span>
     </div>
   )
@@ -673,7 +673,7 @@ function SessionRow({
             {labels.map((l) => (
               <span
                 key={l.id}
-                className="inline-flex items-center gap-0.5 rounded bg-muted text-[10px] text-muted-foreground px-1 py-px"
+                className="inline-flex items-center gap-0.5 rounded bg-muted text-2xs text-muted-foreground px-1 py-px"
                 title={`Label: ${l.name}`}
               >
                 <Tag className="h-2.5 w-2.5" />
@@ -786,7 +786,7 @@ function AddLabelDialog({
           Labels for {count} session{count === 1 ? '' : 's'}
         </DialogTitle>
         <div className="space-y-2 mt-2">
-          <p className="text-[11px] text-muted-foreground/70">
+          <p className="text-2xs text-muted-foreground/70">
             Toggle labels on or off for the selected sessions. Click Done to apply.
           </p>
           {labels.length === 0 ? (
@@ -868,9 +868,7 @@ function AddLabelDialog({
                   <X className="h-3.5 w-3.5" />
                 </Button>
               </div>
-              {newLabelError && (
-                <p className="text-[11px] text-destructive mt-1">{newLabelError}</p>
-              )}
+              {newLabelError && <p className="text-2xs text-destructive mt-1">{newLabelError}</p>}
             </div>
           ) : (
             <div className="flex items-center">

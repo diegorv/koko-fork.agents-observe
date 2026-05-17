@@ -758,7 +758,7 @@ function SessionStats({ sessionId }: { sessionId: string }) {
       {/* Permissions */}
       {(stats.permissionRequests > 0 || stats.permissionDenials > 0) && (
         <div>
-          <div className="text-[10px] uppercase tracking-wider text-muted-foreground/60 mb-1.5">
+          <div className="text-2xs uppercase tracking-wider text-muted-foreground/60 mb-1.5">
             Permissions
           </div>
           <div className="grid grid-cols-3 gap-3">
@@ -771,7 +771,7 @@ function SessionStats({ sessionId }: { sessionId: string }) {
       {/* Top tools */}
       {stats.topTools.length > 0 && (
         <div>
-          <div className="text-[10px] uppercase tracking-wider text-muted-foreground/60 mb-1.5">
+          <div className="text-2xs uppercase tracking-wider text-muted-foreground/60 mb-1.5">
             Top Tools
           </div>
           <div className="space-y-1">
@@ -797,7 +797,7 @@ function SessionStats({ sessionId }: { sessionId: string }) {
       {/* Longest tool call */}
       {stats.longestToolCall && (
         <div>
-          <div className="text-[10px] uppercase tracking-wider text-muted-foreground/60 mb-1.5">
+          <div className="text-2xs uppercase tracking-wider text-muted-foreground/60 mb-1.5">
             Longest Tool Call
           </div>
           <div className="text-sm">
@@ -812,7 +812,7 @@ function SessionStats({ sessionId }: { sessionId: string }) {
       {/* Token usage */}
       {(stats.totalTokens.input > 0 || stats.totalTokens.output > 0) && (
         <div>
-          <div className="text-[10px] uppercase tracking-wider text-muted-foreground/60 mb-1.5">
+          <div className="text-2xs uppercase tracking-wider text-muted-foreground/60 mb-1.5">
             Token Usage (Subagents)
           </div>
           <div className="grid grid-cols-3 gap-3 mb-3">
@@ -846,7 +846,7 @@ function SessionStats({ sessionId }: { sessionId: string }) {
           {stats.agentUsage.length > 0 && (
             <TooltipProvider>
               <div className="rounded-md border border-border/50 overflow-hidden">
-                <table className="w-full text-[10px]">
+                <table className="w-full text-2xs">
                   <thead>
                     <tr className="bg-muted/30 text-muted-foreground">
                       <th className="text-left px-2 py-1.5 font-medium">Agent</th>
@@ -963,7 +963,7 @@ function SessionLabelsTab({ sessionId }: { sessionId: string }) {
                   type="button"
                   aria-pressed={selected}
                   onClick={() => toggleSessionLabel(label.id, sessionId)}
-                  className={`px-2 py-1 text-[11px] transition-colors cursor-pointer ${
+                  className={`px-2 py-1 text-2xs transition-colors cursor-pointer ${
                     selected
                       ? 'bg-primary text-primary-foreground border-primary'
                       : 'bg-background text-foreground hover:bg-accent'
@@ -1013,8 +1013,8 @@ function SessionLabelsTab({ sessionId }: { sessionId: string }) {
           Add
         </Button>
       </div>
-      {error && <p className="text-[11px] text-destructive mt-1.5">{error}</p>}
-      <p className="text-[10px] text-muted-foreground/70 mt-3">
+      {error && <p className="text-2xs text-destructive mt-1.5">{error}</p>}
+      <p className="text-2xs text-muted-foreground/70 mt-3">
         Labels are saved in this browser only.
       </p>
     </div>
@@ -1024,7 +1024,7 @@ function SessionLabelsTab({ sessionId }: { sessionId: string }) {
 function StatCard({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-md bg-muted/30 px-3 py-2">
-      <div className="text-[10px] text-muted-foreground/70">{label}</div>
+      <div className="text-2xs text-muted-foreground/70">{label}</div>
       <div className="text-sm font-medium">{value}</div>
     </div>
   )
@@ -1076,7 +1076,7 @@ function CopyRow({
       <span className="text-muted-foreground/60 shrink-0 mt-px">{icon}</span>
       <span className="text-muted-foreground w-24 shrink-0">{label}</span>
       <span
-        className={`flex-1 min-w-0 font-mono text-[11px] ${wrap ? 'break-all' : 'truncate'}`}
+        className={`flex-1 min-w-0 font-mono text-2xs ${wrap ? 'break-all' : 'truncate'}`}
         title={wrap ? undefined : value}
       >
         {display ?? value}

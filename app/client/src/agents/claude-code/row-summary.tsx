@@ -33,19 +33,17 @@ export function ClaudeCodeRowSummary({ event, dataApi }: Props) {
     <>
       {/* Show hook name when dedup is off so you know exactly what this event is */}
       {!event.dedupMode && (
-        <span className="text-[10px] text-muted-foreground/40 shrink-0">{event.hookName}</span>
+        <span className="text-2xs text-muted-foreground/40 shrink-0">{event.hookName}</span>
       )}
       {/* Slot 1: colored "tool" slot — uses iconColor from the enriched event */}
       {event.summaryTool && (
-        <span
-          className={`text-xs font-medium shrink-0 ${iconColor || 'text-blue-700 dark:text-blue-400'}`}
-        >
+        <span className={`text-xs shrink-0 ${iconColor || 'text-blue-700 dark:text-blue-400'}`}>
           {event.summaryTool}
         </span>
       )}
       {/* Slot 2: gray "cmd" slot */}
       {event.summaryCmd && (
-        <span className="text-[10px] text-muted-foreground/50 shrink-0">{event.summaryCmd}</span>
+        <span className="text-2xs text-muted-foreground/50 shrink-0">{event.summaryCmd}</span>
       )}
       {/* Summary text */}
       {summaryHasNewline ? (
@@ -60,7 +58,7 @@ export function ClaudeCodeRowSummary({ event, dataApi }: Props) {
         <span className="text-xs text-muted-foreground truncate flex-1 min-w-0">{summary}</span>
       )}
       {runtimeLabel && (
-        <span className="text-[10px] text-muted-foreground/60 shrink-0 tabular-nums">
+        <span className="text-2xs text-muted-foreground/60 shrink-0 tabular-nums">
           {runtimeLabel}
         </span>
       )}

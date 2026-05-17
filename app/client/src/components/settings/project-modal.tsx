@@ -311,7 +311,7 @@ export function ProjectModal({ project, open, onOpenChange }: ProjectModalProps)
                     </div>
                   ) : (
                     <button
-                      className="flex items-center gap-1 ml-auto text-[10px] text-muted-foreground hover:text-foreground cursor-pointer"
+                      className="flex items-center gap-1 ml-auto text-2xs text-muted-foreground hover:text-foreground cursor-pointer"
                       onClick={() =>
                         setSortOrder(sortOrder === 'activity' ? 'created' : 'activity')
                       }
@@ -528,12 +528,12 @@ function SessionRow({
             <span className="truncate">{label}</span>
           )}
           {!isEditing && (
-            <span className="ml-auto shrink-0 text-[10px] text-muted-foreground">
+            <span className="ml-auto shrink-0 text-2xs text-muted-foreground">
               Created {createdTime}
             </span>
           )}
         </div>
-        <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground min-w-0">
+        <div className="flex items-center gap-1.5 text-2xs text-muted-foreground min-w-0">
           <span
             className={`h-1.5 w-1.5 rounded-full shrink-0 ${
               session.status === 'active'
@@ -643,7 +643,7 @@ export function MoveSessionModal({
                   <Folder className="h-4 w-4 shrink-0 text-muted-foreground" />
                   <span className="truncate">{p.name}</span>
                   {p.sessionCount != null && (
-                    <span className="ml-auto text-[10px] text-muted-foreground">
+                    <span className="ml-auto text-2xs text-muted-foreground">
                       {p.sessionCount} sessions
                     </span>
                   )}

@@ -4,7 +4,7 @@ function Kbd({ children, className }: { children: React.ReactNode; className?: s
   return (
     <kbd
       className={cn(
-        'inline-flex items-center justify-center min-w-[1.5rem] h-5 px-1.5 text-[10px] font-mono font-medium',
+        'inline-flex items-center justify-center min-w-[1.5rem] h-5 px-1.5 text-2xs font-mono font-medium',
         'rounded border border-border bg-muted text-foreground/80',
         className,
       )}
@@ -52,7 +52,7 @@ export function KeyboardSettings() {
           keys={
             <>
               <Kbd>/</Kbd>
-              <span className="text-[10px] text-muted-foreground/60">or</span>
+              <span className="text-2xs text-muted-foreground/60">or</span>
               <Kbd>s</Kbd>
             </>
           }
@@ -78,7 +78,7 @@ export function KeyboardSettings() {
           keys={
             <>
               <Kbd>Enter</Kbd>
-              <span className="text-[10px] text-muted-foreground/60">or</span>
+              <span className="text-2xs text-muted-foreground/60">or</span>
               <Kbd>Space</Kbd>
             </>
           }
@@ -109,7 +109,7 @@ export function KeyboardSettings() {
           keys={
             <>
               <Kbd>Enter</Kbd>
-              <span className="text-[10px] text-muted-foreground/60">or</span>
+              <span className="text-2xs text-muted-foreground/60">or</span>
               <Kbd>Space</Kbd>
             </>
           }
@@ -126,7 +126,7 @@ export function KeyboardSettings() {
             <>
               <Kbd>⌘</Kbd>
               <Kbd>↑</Kbd>
-              <span className="text-[10px] text-muted-foreground/60">or</span>
+              <span className="text-2xs text-muted-foreground/60">or</span>
               <Kbd>Home</Kbd>
             </>
           }
@@ -137,7 +137,7 @@ export function KeyboardSettings() {
             <>
               <Kbd>⌘</Kbd>
               <Kbd>↓</Kbd>
-              <span className="text-[10px] text-muted-foreground/60">or</span>
+              <span className="text-2xs text-muted-foreground/60">or</span>
               <Kbd>End</Kbd>
             </>
           }

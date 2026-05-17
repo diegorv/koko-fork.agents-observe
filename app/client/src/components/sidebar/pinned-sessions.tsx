@@ -68,7 +68,7 @@ export function PinnedSessions({ collapsed }: { collapsed: boolean }) {
 
   return (
     <div className="px-2 py-1">
-      <div className="text-[10px] uppercase tracking-wider text-muted-foreground/80 dark:text-muted-foreground/60 px-2 pb-0.5 select-none">
+      <div className="text-2xs uppercase tracking-wider text-muted-foreground/80 dark:text-muted-foreground/60 px-2 pb-0.5 select-none">
         Pinned
       </div>
       {sessions.map((session) => (

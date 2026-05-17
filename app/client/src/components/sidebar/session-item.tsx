@@ -224,7 +224,7 @@ export function SessionItem({
               </span>
             )}
             {!isEditing && relativeTime && (
-              <span className="text-[10px] text-muted-foreground/60 dark:text-muted-foreground/40 ml-auto shrink-0 hidden @[275px]:inline group-hover:!hidden">
+              <span className="text-2xs text-muted-foreground/60 dark:text-muted-foreground/40 ml-auto shrink-0 hidden @[275px]:inline group-hover:!hidden">
                 {relativeTime}
               </span>
             )}
@@ -232,7 +232,7 @@ export function SessionItem({
               <Badge
                 variant="outline"
                 className={cn(
-                  'text-[9px] h-3.5 px-1 shrink-0 hidden @[200px]:inline-flex group-hover:!hidden',
+                  'text-2xs h-3.5 px-1 shrink-0 hidden @[200px]:inline-flex group-hover:!hidden',
                   'text-muted-foreground/60',
                   relativeTime ? 'ml-auto @[275px]:ml-0' : 'ml-auto',
                 )}
@@ -257,7 +257,7 @@ export function SessionItem({
           </div>
           {cwd && showCwd && (
             <div
-              className="pl-[18px] pb-0.5 text-[10px] text-muted-foreground/30 dark:text-muted-foreground/20 group-hover:text-muted-foreground/70 dark:group-hover:text-muted-foreground/50 transition-colors truncate"
+              className="pl-[18px] pb-0.5 text-2xs text-muted-foreground/30 dark:text-muted-foreground/20 group-hover:text-muted-foreground/70 dark:group-hover:text-muted-foreground/50 transition-colors truncate"
               dir="rtl"
             >
               <span dir="ltr">{shortenCwd(cwd)}</span>

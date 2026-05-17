@@ -30,10 +30,10 @@ export function ClaudeCodeDotTooltip({ event }: { event: EnrichedEvent }) {
     <div className="space-y-0.5">
       <div className="font-medium">{label}</div>
       {summary && <div className="opacity-90 max-w-48 truncate">{summary}</div>}
-      <div className="opacity-60 text-[10px]">
+      <div className="opacity-60 text-2xs">
         {formatTimeOfDay(event.timestamp)} · {format(event.timestamp)}
       </div>
-      {event.hookName !== label && <div className="opacity-40 text-[9px]">{event.hookName}</div>}
+      {event.hookName !== label && <div className="opacity-40 text-2xs">{event.hookName}</div>}
     </div>
   )
 }

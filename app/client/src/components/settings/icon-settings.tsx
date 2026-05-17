@@ -114,7 +114,7 @@ export function IconSettings() {
           {grouped.map((group) => (
             <div key={group.group}>
               <div className="px-2 pt-3 pb-1 first:pt-0">
-                <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/70">
+                <span className="text-2xs font-semibold uppercase tracking-wider text-muted-foreground/70">
                   {group.group}
                 </span>
               </div>
@@ -196,7 +196,7 @@ function EventRow({ entry, customization, onChangeIcon, onChangeColor, onReset }
       <div className="flex-1 min-w-0">
         <span className="truncate text-xs">{entry.name}</span>
         {entry.name !== entry.id && (
-          <span className="ml-1.5 truncate font-mono text-[10px] text-muted-foreground/60">
+          <span className="ml-1.5 truncate font-mono text-2xs text-muted-foreground/60">
             {entry.id}
           </span>
         )}

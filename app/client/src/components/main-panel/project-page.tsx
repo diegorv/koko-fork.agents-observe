@@ -36,7 +36,7 @@ export function ProjectPage() {
         <Tooltip>
           <TooltipTrigger asChild>
             <button
-              className="flex items-center gap-1 text-[10px] text-muted-foreground hover:text-foreground cursor-pointer"
+              className="flex items-center gap-1 text-2xs text-muted-foreground hover:text-foreground cursor-pointer"
               onClick={() =>
                 setSessionSortOrder(sessionSortOrder === 'activity' ? 'created' : 'activity')
               }

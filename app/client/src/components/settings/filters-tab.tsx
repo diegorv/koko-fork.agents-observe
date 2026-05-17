@@ -189,7 +189,7 @@ export function FiltersTab() {
           <button
             type="button"
             onClick={() => setResetConfirmOpen(true)}
-            className="text-[10px] uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors text-center"
+            className="text-2xs uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors text-center"
           >
             Reload defaults
           </button>
@@ -268,7 +268,7 @@ function Section({
   return (
     <div className={cn('mb-3', className)}>
       <div
-        className={cn('flex items-center px-2 mb-1 text-[10px] uppercase font-semibold', toneClass)}
+        className={cn('flex items-center px-2 mb-1 text-2xs uppercase font-semibold', toneClass)}
       >
         <span className="flex-1">{label}</span>
       </div>
@@ -451,7 +451,7 @@ function FilterEditor({
         // Float the UNSAVED chip half-over the top-left corner so it
         // reads as a status badge on the card rather than a chip in the
         // toolbar. Solid background occludes the border behind it.
-        <span className="absolute -top-2 left-3 z-10 text-[10px] font-mono uppercase tracking-wider px-1.5 py-0.5 rounded bg-violet-500 text-white shadow-sm">
+        <span className="absolute -top-2 left-3 z-10 text-2xs font-mono uppercase tracking-wider px-1.5 py-0.5 rounded bg-violet-500 text-white shadow-sm">
           Unsaved
         </span>
       ) : null}
@@ -460,7 +460,7 @@ function FilterEditor({
           <button
             onClick={() => void update(filter.id, { enabled: !filter.enabled })}
             className={cn(
-              'text-[10px] font-mono px-2 py-0.5 rounded border transition-colors',
+              'text-2xs font-mono px-2 py-0.5 rounded border transition-colors',
               filter.enabled
                 ? 'border-green-500/40 bg-green-500/15 text-green-700 dark:text-green-400'
                 : 'border-border text-muted-foreground hover:bg-accent',
@@ -571,7 +571,7 @@ function FilterEditor({
           {/* Help text spans the full row below all three columns so neither
               caption wraps. Vars hint is left-aligned under Pill name; the
               CSS-color hint is right-aligned so it lines up under Color. */}
-          <div className="mt-1 flex justify-between gap-3 text-[10px] text-muted-foreground">
+          <div className="mt-1 flex justify-between gap-3 text-2xs text-muted-foreground">
             <span>
               Vars: <code>{'{hookName}'}</code> <code>{'{toolName}'}</code>{' '}
               <code>{'{bashCommand}'}</code>
@@ -585,7 +585,7 @@ function FilterEditor({
             <label className="text-xs uppercase text-muted-foreground">Patterns</label>
             <span className="text-xs text-muted-foreground">·</span>
             <span className="text-xs text-muted-foreground">combine with:</span>
-            <div className="flex border rounded text-[10px] overflow-hidden">
+            <div className="flex border rounded text-2xs overflow-hidden">
               {(['and', 'or'] as const).map((c) => (
                 <button
                   key={c}
@@ -624,7 +624,7 @@ function FilterEditor({
                       className={cn('h-2.5 w-2.5 rounded-sm shrink-0', patternPaletteClass(i))}
                       title={`Pattern ${i + 1} highlight color (used in preview)`}
                     />
-                    <div className="flex border rounded text-[10px] overflow-hidden">
+                    <div className="flex border rounded text-2xs overflow-hidden">
                       {(['hook', 'tool', 'payload'] as const).map((t) => (
                         <button
                           key={t}
@@ -750,7 +750,7 @@ function FilterEditor({
 
           <button
             type="button"
-            className="self-start mt-2 px-2 py-1 text-[10px] rounded border border-muted-foreground/30 text-muted-foreground hover:text-foreground hover:border-foreground/40 transition-colors"
+            className="self-start mt-2 px-2 py-1 text-2xs rounded border border-muted-foreground/30 text-muted-foreground hover:text-foreground hover:border-foreground/40 transition-colors"
             onClick={() => setDraft({ patterns: [...patterns, { target: 'hook', regex: '' }] })}
           >
             + Add pattern
@@ -1074,16 +1074,16 @@ function LivePreview({
           </div>
           <pre
             ref={preRef}
-            // ~5 lines at text-[11px] leading-snug (~15px line-height)
+            // ~5 lines at text-2xs leading-snug (~15px line-height)
             // plus p-2 vertical padding ≈ 91px. Set explicitly so the
             // preview never grows tall enough to push other editor
             // content out of view.
-            className="max-h-[91px] overflow-auto rounded bg-background/60 border border-border/40 p-2 font-mono text-[11px] leading-snug whitespace-pre-wrap break-all text-muted-foreground"
+            className="max-h-[91px] overflow-auto rounded bg-background/60 border border-border/40 p-2 font-mono text-2xs leading-snug whitespace-pre-wrap break-all text-muted-foreground"
           >
             {highlighted.text}
           </pre>
           {highlighted.truncated ? (
-            <div className="text-[10px] italic">
+            <div className="text-2xs italic">
               Showing first {MAX_PREVIEW_TEXT.toLocaleString()} characters
             </div>
           ) : null}
@@ -1132,7 +1132,7 @@ function PatternLegendRow({ h }: { h: PatternHighlight }) {
   })()
 
   return (
-    <div className="flex items-center gap-2 text-[11px]">
+    <div className="flex items-center gap-2 text-2xs">
       {dot}
       <span className="text-foreground">{name}</span>
       <span className="text-muted-foreground">— {body}</span>

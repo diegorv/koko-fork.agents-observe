@@ -214,7 +214,7 @@ export function ActivityTimeline() {
           <div className="flex items-center gap-2">
             <span className="text-xs text-muted-foreground font-medium">Activity</span>
             {rewindMode && (
-              <span className="text-[9px] px-1.5 py-px rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30">
+              <span className="text-2xs px-1.5 py-px rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30">
                 REWIND
               </span>
             )}
@@ -244,8 +244,8 @@ export function ActivityTimeline() {
               size="sm"
               className={
                 rewindMode
-                  ? 'h-5 px-2 text-[10px] mr-1 border-orange-500/70 text-orange-600 dark:text-orange-400 hover:bg-orange-500/10'
-                  : 'h-5 px-2 text-[10px] mr-1 border-green-500 bg-green-500/10 text-green-600 dark:text-green-400 hover:bg-green-500/20'
+                  ? 'h-5 px-2 text-2xs mr-1 border-orange-500/70 text-orange-600 dark:text-orange-400 hover:bg-orange-500/10'
+                  : 'h-5 px-2 text-2xs mr-1 border-green-500 bg-green-500/10 text-green-600 dark:text-green-400 hover:bg-green-500/20'
               }
               onClick={handleToggleRewind}
               title={rewindMode ? 'Resume live view' : 'Pause and rewind'}
@@ -265,7 +265,7 @@ export function ActivityTimeline() {
                 key={r}
                 variant={timeRange === r ? 'default' : 'ghost'}
                 size="sm"
-                className="h-5 px-2 text-[10px]"
+                className="h-5 px-2 text-2xs"
                 onClick={() => {
                   // Rewind mode rebuilds the whole horizontal timeline
                   // on range change — can take several seconds on large

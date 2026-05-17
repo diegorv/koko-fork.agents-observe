@@ -403,7 +403,7 @@ export function EventStream() {
                 )}
               </span>
               {firstTs && lastTs && (
-                <span className="text-[10px] text-muted-foreground/70 dark:text-muted-foreground/50">
+                <span className="text-2xs text-muted-foreground/70 dark:text-muted-foreground/50">
                   {format(firstTs)} — {format(lastTs)}
                 </span>
               )}

@@ -291,7 +291,7 @@ export function AgentLane({
     <div className="relative h-8 border-b border-border/30">
       <button
         className={cn(
-          'absolute left-0 top-0 bottom-0 w-40 text-[10px] truncate px-2 text-left cursor-pointer hover:underline flex items-center gap-1',
+          'absolute left-0 top-0 bottom-0 w-40 text-2xs truncate px-2 text-left cursor-pointer hover:underline flex items-center gap-1',
           color,
           isSubagent ? 'opacity-80 dark:opacity-50' : 'opacity-100 dark:opacity-70',
         )}

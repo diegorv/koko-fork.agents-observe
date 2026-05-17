@@ -63,7 +63,7 @@ export function SessionBreadcrumb() {
         </>
       )}
       <button
-        className={`ml-auto rounded-full px-2 py-0.5 text-[10px] border cursor-pointer transition-colors shrink-0 ${
+        className={`ml-auto rounded-full px-2 py-0.5 text-2xs border cursor-pointer transition-colors shrink-0 ${
           dedupEnabled
             ? 'border-border/50 text-muted-foreground/50 hover:border-border hover:text-muted-foreground'
             : 'border-orange-500/50 text-orange-500 hover:border-orange-500 hover:text-orange-600'

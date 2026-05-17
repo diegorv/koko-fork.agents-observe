@@ -266,7 +266,7 @@ export function LabelsModalBody() {
               Cancel
             </Button>
           </div>
-          {newLabelError && <p className="text-[10px] text-destructive mt-1">{newLabelError}</p>}
+          {newLabelError && <p className="text-2xs text-destructive mt-1">{newLabelError}</p>}
         </div>
       )}
 
@@ -291,7 +291,7 @@ export function LabelsModalBody() {
         )}
       </div>
 
-      <div className="border-t px-5 py-2 text-[10px] text-muted-foreground/70">
+      <div className="border-t px-5 py-2 text-2xs text-muted-foreground/70">
         Labels are saved in this browser only.
       </div>
     </>
@@ -468,7 +468,7 @@ function LabelGroup({
         ) : (
           <>
             <span className="text-xs font-medium truncate">{label.name}</span>
-            <Badge variant="secondary" className="text-[10px] h-4 px-1">
+            <Badge variant="secondary" className="text-2xs h-4 px-1">
               {sessions.length}
             </Badge>
             <div className="ml-auto flex items-center gap-0.5 opacity-0 group-hover/header:opacity-100 transition-opacity">
@@ -496,9 +496,9 @@ function LabelGroup({
           </>
         )}
       </div>
-      {renameError && <div className="px-5 pb-1 text-[10px] text-destructive">{renameError}</div>}
+      {renameError && <div className="px-5 pb-1 text-2xs text-destructive">{renameError}</div>}
       {sessions.length === 0 && (
-        <div className="px-5 py-2 text-[11px] text-muted-foreground/70 italic">
+        <div className="px-5 py-2 text-2xs text-muted-foreground/70 italic">
           No sessions in this label yet.
         </div>
       )}
@@ -584,11 +584,9 @@ function SessionRow({
         />
         <span className="text-xs font-medium truncate">{name}</span>
         {session.projectName && (
-          <span className="text-[11px] text-muted-foreground truncate">
-            · {session.projectName}
-          </span>
+          <span className="text-2xs text-muted-foreground truncate">· {session.projectName}</span>
         )}
-        <span className="ml-auto flex items-center gap-1.5 shrink-0 text-[10px] text-muted-foreground">
+        <span className="ml-auto flex items-center gap-1.5 shrink-0 text-2xs text-muted-foreground">
           {/* Open session edit modal — standardized SquarePen glyph
               used across the app (sessions tab, projects tab, scope
               bar, sidebar rows). */}
@@ -620,7 +618,7 @@ function SessionRow({
           )}
         </span>
       </div>
-      <div className="flex items-center gap-2 mt-0.5 text-[10px] text-muted-foreground/80">
+      <div className="flex items-center gap-2 mt-0.5 text-2xs text-muted-foreground/80">
         <span className="flex items-center gap-1 shrink-0">
           <Clock className="h-3 w-3" />
           {formatRelativeTime(session.lastActivity)}
@@ -631,7 +629,7 @@ function SessionRow({
             {sessionLabels.map((l) => (
               <span
                 key={l.id}
-                className="px-1 py-px rounded bg-muted text-[9px] text-muted-foreground"
+                className="px-1 py-px rounded bg-muted text-2xs text-muted-foreground"
               >
                 {l.name}
               </span>

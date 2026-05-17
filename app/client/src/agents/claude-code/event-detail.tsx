@@ -68,7 +68,7 @@ const mdComponents = {
     </h2>
   ),
   h3: ({ children, ...props }: React.ComponentProps<'h3'>) => (
-    <h3 className="text-[11px] font-semibold mt-2 first:mt-0 mb-1" {...props}>
+    <h3 className="text-2xs font-semibold mt-2 first:mt-0 mb-1" {...props}>
       {children}
     </h3>
   ),
@@ -102,7 +102,7 @@ const mdComponents = {
     if (isBlock) {
       return (
         <code
-          className="block bg-black/20 dark:bg-white/10 border border-border/50 rounded p-1.5 font-mono text-[10px] leading-relaxed overflow-x-auto my-1.5"
+          className="block bg-black/20 dark:bg-white/10 border border-border/50 rounded p-1.5 font-mono text-2xs leading-relaxed overflow-x-auto my-1.5"
           {...props}
         >
           {children}
@@ -111,7 +111,7 @@ const mdComponents = {
     }
     return (
       <code
-        className="bg-black/10 dark:bg-white/10 border border-border/40 rounded px-1 py-0.5 font-mono text-[10px] text-amber-700 dark:text-amber-400"
+        className="bg-black/10 dark:bg-white/10 border border-border/40 rounded px-1 py-0.5 font-mono text-2xs text-amber-700 dark:text-amber-400"
         {...props}
       >
         {children}
@@ -322,7 +322,7 @@ function RawPayloadSection({
       >
         {open ? <ChevronDown className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
         <span>{label}</span>
-        <span className="ml-2 text-[10px] text-muted-foreground/70 dark:text-muted-foreground/60 tabular-nums">
+        <span className="ml-2 text-2xs text-muted-foreground/70 dark:text-muted-foreground/60 tabular-nums">
           {formatTimeOfDay(timestamp)}
         </span>
         <button
@@ -337,7 +337,7 @@ function RawPayloadSection({
         </button>
       </div>
       {open && (
-        <pre className="overflow-x-auto rounded bg-muted/50 p-2 font-mono text-[10px] leading-relaxed mt-1">
+        <pre className="overflow-x-auto rounded bg-muted/50 p-2 font-mono text-2xs leading-relaxed mt-1">
           {payloadStr}
         </pre>
       )}
@@ -575,7 +575,7 @@ function ToolDetail({
                   <div
                     key={e.id}
                     className={cn(
-                      'flex items-center gap-2 px-2 py-0.5 rounded text-[11px]',
+                      'flex items-center gap-2 px-2 py-0.5 rounded text-2xs',
                       e.id === event.id ? 'bg-primary/10 font-medium' : 'text-muted-foreground',
                     )}
                   >
@@ -601,11 +601,11 @@ function ToolDetail({
                     </span>
                     <span className="shrink-0">{label}</span>
                     {detail && (
-                      <span className="truncate flex-1 min-w-0 text-[10px] text-muted-foreground/60">
+                      <span className="truncate flex-1 min-w-0 text-2xs text-muted-foreground/60">
                         {detail}
                       </span>
                     )}
-                    <span className="text-[9px] text-muted-foreground/70 tabular-nums shrink-0 ml-auto">
+                    <span className="text-2xs text-muted-foreground/70 tabular-nums shrink-0 ml-auto">
                       {new Date(e.timestamp).toLocaleTimeString('en-US', {
                         hour12: false,
                         hour: '2-digit',
@@ -965,7 +965,7 @@ function DetailCode({ label, value, diff }: { label: string; value?: string; dif
   const copyButton = (
     <button
       type="button"
-      className="flex items-center gap-1 text-[9px] text-muted-foreground/70 hover:text-muted-foreground transition-colors cursor-pointer"
+      className="flex items-center gap-1 text-2xs text-muted-foreground/70 hover:text-muted-foreground transition-colors cursor-pointer"
       onClick={() => {
         navigator.clipboard.writeText(value)
         setCopied(true)
@@ -998,7 +998,7 @@ function DetailCode({ label, value, diff }: { label: string; value?: string; dif
           <div className="flex items-center gap-1 mb-0.5">
             <button
               type="button"
-              className="flex items-center gap-1 text-[9px] text-muted-foreground/70 hover:text-muted-foreground transition-colors cursor-pointer"
+              className="flex items-center gap-1 text-2xs text-muted-foreground/70 hover:text-muted-foreground transition-colors cursor-pointer"
               onClick={() => setShowRaw(!showRaw)}
             >
               {showRaw ? <Code className="h-2.5 w-2.5" /> : <FileText className="h-2.5 w-2.5" />}
@@ -1014,13 +1014,13 @@ function DetailCode({ label, value, diff }: { label: string; value?: string; dif
             </div>
           )}
           {showRaw ? (
-            <pre className="overflow-x-auto rounded bg-muted/50 p-1.5 font-mono text-[10px] leading-relaxed max-h-40 overflow-y-auto">
+            <pre className="overflow-x-auto rounded bg-muted/50 p-1.5 font-mono text-2xs leading-relaxed max-h-40 overflow-y-auto">
               {value}
             </pre>
           ) : hasDiff ? (
             <DiffPre value={value} />
           ) : (
-            <div className="overflow-y-auto max-h-40 rounded bg-muted/50 p-1.5 text-[11px] leading-relaxed prose-sm">
+            <div className="overflow-y-auto max-h-40 rounded bg-muted/50 p-1.5 text-2xs leading-relaxed prose-sm">
               <Markdown components={mdComponents}>{value}</Markdown>
             </div>
           )}
@@ -1034,7 +1034,7 @@ function DetailCode({ label, value, diff }: { label: string; value?: string; dif
 function DiffPre({ value }: { value: string }) {
   const lines = value.split('\n')
   return (
-    <pre className="overflow-x-auto rounded bg-muted/50 p-1.5 font-mono text-[10px] leading-relaxed max-h-40 overflow-y-auto">
+    <pre className="overflow-x-auto rounded bg-muted/50 p-1.5 font-mono text-2xs leading-relaxed max-h-40 overflow-y-auto">
       {lines.map((line, i) => {
         let cls = ''
         if (line.startsWith('+') && !line.startsWith('+++')) {
@@ -1059,11 +1059,9 @@ function DetailDiff({ oldValue, newValue }: { oldValue: string; newValue: string
   return (
     <div className="flex gap-2">
       <span className="text-muted-foreground shrink-0 w-20 text-right">Diff:</span>
-      <div className="flex-1 min-w-0 overflow-x-auto rounded bg-muted/50 max-h-60 overflow-y-auto [&_table]:!bg-transparent text-[10px]">
+      <div className="flex-1 min-w-0 overflow-x-auto rounded bg-muted/50 max-h-60 overflow-y-auto [&_table]:!bg-transparent text-2xs">
         <Suspense
-          fallback={
-            <pre className="p-1.5 font-mono text-[10px] leading-relaxed">Loading diff...</pre>
-          }
+          fallback={<pre className="p-1.5 font-mono text-2xs leading-relaxed">Loading diff...</pre>}
         >
           <ReactDiffViewer
             oldValue={oldValue}
@@ -1117,7 +1115,7 @@ function ThreadEvent({
   return (
     <div
       className={cn(
-        'flex items-center gap-2 px-2 py-0.5 rounded text-[11px]',
+        'flex items-center gap-2 px-2 py-0.5 rounded text-2xs',
         isCurrentEvent ? 'bg-primary/10 font-medium' : 'text-muted-foreground',
       )}
     >
@@ -1142,8 +1140,8 @@ function ThreadEvent({
           {event.toolName}
         </span>
       )}
-      <span className="truncate flex-1 text-[10px]">{summary}</span>
-      <span className="text-[9px] text-muted-foreground/70 dark:text-muted-foreground/50 tabular-nums shrink-0">
+      <span className="truncate flex-1 text-2xs">{summary}</span>
+      <span className="text-2xs text-muted-foreground/70 dark:text-muted-foreground/50 tabular-nums shrink-0">
         {new Date(event.timestamp).toLocaleTimeString('en-US', {
           hour12: false,
           hour: '2-digit',

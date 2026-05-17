@@ -214,14 +214,14 @@ export function ProjectList({ collapsed }: ProjectListProps) {
                 {project.sessionCount != null && (
                   <Badge
                     variant="secondary"
-                    className="ml-auto text-[10px] h-4 px-1 group-hover:hidden"
+                    className="ml-auto text-2xs h-4 px-1 group-hover:hidden"
                   >
                     {project.sessionCount}
                   </Badge>
                 )}
                 <span
                   data-testid={`edit-project-${project.id}`}
-                  className="ml-auto hidden group-hover:flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-yellow-500/20 text-yellow-600 dark:text-yellow-400 hover:bg-yellow-500/30 text-[10px] cursor-pointer transition-colors"
+                  className="ml-auto hidden group-hover:flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-yellow-500/20 text-yellow-600 dark:text-yellow-400 hover:bg-yellow-500/30 text-2xs cursor-pointer transition-colors"
                   onClick={(e) => openProjectModal(project, e)}
                 >
                   <Pencil className="h-2.5 w-2.5" />
@@ -299,7 +299,7 @@ function UnassignedBucket({ sessions, collapsed }: { sessions: Session[]; collap
         )}
         <Folder className="h-3.5 w-3.5 shrink-0 text-muted-foreground/60" />
         <span className="truncate italic">Unassigned</span>
-        <Badge variant="secondary" className="ml-auto text-[10px] h-4 px-1">
+        <Badge variant="secondary" className="ml-auto text-2xs h-4 px-1">
           {sessions.length}
         </Badge>
       </div>
@@ -470,14 +470,14 @@ function SessionList({ projectId }: { projectId: number }) {
         return (
           <div key={group.label} className={groupIndex > 0 ? 'mt-3' : ''}>
             <div className="flex items-center px-2 pt-0 pb-0.5 select-none">
-              <span className="text-[10px] uppercase tracking-wider text-muted-foreground/50 dark:text-muted-foreground/30">
+              <span className="text-2xs uppercase tracking-wider text-muted-foreground/50 dark:text-muted-foreground/30">
                 {group.label}
               </span>
               {groupIndex === 0 && (
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <button
-                      className="flex items-center gap-1 ml-auto text-[10px] text-muted-foreground hover:text-foreground cursor-pointer"
+                      className="flex items-center gap-1 ml-auto text-2xs text-muted-foreground hover:text-foreground cursor-pointer"
                       onClick={() =>
                         setSessionSortOrder(
                           sessionSortOrder === 'activity' ? 'created' : 'activity',
@@ -539,7 +539,7 @@ function SessionList({ projectId }: { projectId: number }) {
             {hiddenCount > 0 && (
               <button
                 data-sidebar-item=""
-                className="w-full text-[10px] text-muted-foreground hover:text-foreground px-2 py-1 cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-ring rounded"
+                className="w-full text-2xs text-muted-foreground hover:text-foreground px-2 py-1 cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-ring rounded"
                 onClick={() => toggleGroup(group.label)}
               >
                 Show {hiddenCount} more...
@@ -550,7 +550,7 @@ function SessionList({ projectId }: { projectId: number }) {
               group.sessions.length > previewCount && (
                 <button
                   data-sidebar-item=""
-                  className="w-full text-[10px] text-muted-foreground hover:text-foreground px-2 py-1 cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-ring rounded"
+                  className="w-full text-2xs text-muted-foreground hover:text-foreground px-2 py-1 cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-ring rounded"
                   onClick={() => toggleGroup(group.label)}
                 >
                   Show less
