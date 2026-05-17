@@ -1,5 +1,15 @@
 # Changelog
 
+## v1.0.1 — Dependency refresh
+
+Brings every direct dependency to its current latest within the existing major. No source-code changes; each bump shipped as a separate commit with the full test suite (802 tests) green before commit.
+
+### Other
+
+- **Root**: `@types/bun` 1.3.11 → 1.3.14.
+- **Server**: `@types/node` 25.5 → 25.8, `ws` 8.20.0 → 8.20.1, `tsx` 4.21 → 4.22.1, `better-sqlite3` 12.8 → 12.10, `hono` 4.12.9 → 4.12.19, `re2js` 2.6.1 → 2.8.0.
+- **Client**: `@types/node` 25.5 → 25.8, `@types/react` 19.0 → 19.2.14, `@types/react-dom` 19.0 → 19.2.3, `clsx` 2.1.0 → 2.1.1, `class-variance-authority` 0.7.0 → 0.7.1, `@tanstack/react-virtual` 3.13.23 → 3.13.24, `react-diff-viewer-continued` 4.2.0 → 4.2.2, `zustand` 5.0 → 5.0.13, `re2js` 2.6.1 → 2.8.0, `@radix-ui/react-collapsible` 1.0 → 1.1.12, `@radix-ui/react-dropdown-menu` 2.0 → 2.1.16, `@radix-ui/react-scroll-area` 1.0 → 1.2.10, `@radix-ui/react-separator` 1.0 → 1.1.8, `@radix-ui/react-tooltip` 1.0 → 1.2.8, `@tailwindcss/vite` 4.0 → 4.3, `tailwindcss` 4.0 → 4.3, `@tanstack/react-query` 5.0 → 5.100.10, `react` 19.0 → 19.2.6, `react-dom` 19.0 → 19.2.6.
+
 ## v1.0.0 — Hardening release: server stability, WS observability, CI
 
 Focused on backend robustness with defensive fixes across the API server, WebSocket layer, and hook scripts. Adds CI automation via Dependabot and pins the Node toolchain for reproducible builds. Major version bump signals the first release of this fork that has been audited end-to-end and patched against the P0 findings; no breaking API changes.
