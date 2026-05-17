@@ -32,7 +32,7 @@ Three small but security-relevant changes vs upstream. Everything else — the d
 | `docker run` publishes the container port to `127.0.0.1` instead of the Docker default of `0.0.0.0`. Override with `AGENTS_OBSERVE_DOCKER_PUBLISH_HOST=0.0.0.0`. | Same reason at the Docker layer — even if the server binds to all interfaces inside the container, the host bind controls whether the LAN can reach it. |
 | `docker pull` is skipped when the image is already present locally. | Lets you run a locally-built tag like `agents-observe:local` without needing to publish it to a registry. |
 
-Plus an optional [`Dockerfile.local`](./Dockerfile.local) that builds the same server with `npm ci`, a pinned Node base tag, a non-root runtime user, `apt --no-install-recommends`, and a `HEALTHCHECK` against `/api/health`. Build with `just build-hardened`.
+The bundled [`Dockerfile`](./Dockerfile) is also hardened vs upstream: `npm ci` instead of `npm install`, a pinned Node base tag, a non-root runtime user (UID 1000 / `node`), `apt --no-install-recommends`, and a `HEALTHCHECK` against `/api/health`. Build locally with `just build`.
 
 If you don't need any of that, use the upstream project. It is the same code minus those changes.
 
@@ -71,8 +71,8 @@ To avoid pulling a binary image from any registry, build the image locally and p
 git clone https://github.com/diegorv/koko-fork-agents-observe.git
 cd koko-fork-agents-observe
 
-just build-hardened
-# (or: docker build -f Dockerfile.local -t agents-observe:local .)
+just build
+# (or: docker build -t agents-observe:local .)
 
 export AGENTS_OBSERVE_DOCKER_IMAGE=agents-observe:local
 ```
@@ -208,8 +208,8 @@ just test-event       # Send a test event to the server
 just fmt              # Format all source files
 
 # Server (Docker):
-just build            # Build the Docker image with the upstream Dockerfile
-just build-hardened   # Build the hardened image (Dockerfile.local)
+just build            # Build the hardened Docker image locally
+just build   # Build the hardened Docker image locally
 just start            # Start the server (same path as plugin MCP)
 just stop             # Stop the server
 just restart          # Restart the server
@@ -239,8 +239,7 @@ docs/                        # Plans and demo assets
 .claude-plugin/              # Plugin + marketplace manifests
 .env                         # Env config options used by cli & local server
 .mcp.json                    # MCP server configuration
-Dockerfile                   # Upstream production container image
-Dockerfile.local             # Hardened local build (this fork)
+Dockerfile                   # Hardened production container image
 docker-compose.yml           # Container orchestration - not used by the plugin
 justfile                     # Task runner commands
 start.mjs                    # Local server entrypoint (non-Docker)

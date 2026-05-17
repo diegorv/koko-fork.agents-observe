@@ -23,17 +23,10 @@ default:
 
 # ─── Docker ─────────────────────────────────────────────
 
-# Build the Docker image locally
+# Build the hardened Docker image locally.
+# Activate with: export AGENTS_OBSERVE_DOCKER_IMAGE=agents-observe:local
 build:
     docker build -t agents-observe:local .
-
-# Build the HARDENED local image (Dockerfile.local).
-# Multi-stage with pre-compiled TS, npm ci, non-root user, healthcheck, pinned base.
-build-hardened:
-    docker build -f Dockerfile.local -t agents-observe:local .
-    @echo
-    @echo "Built agents-observe:local from Dockerfile.local"
-    @echo "Activate with: export AGENTS_OBSERVE_DOCKER_IMAGE=agents-observe:local"
 
 # Start server (same path as plugin MCP)
 start:
