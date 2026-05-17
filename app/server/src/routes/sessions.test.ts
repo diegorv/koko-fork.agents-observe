@@ -1,6 +1,35 @@
-import { describe, test, expect, vi, beforeEach } from 'vitest'
+import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest'
 import { Hono } from 'hono'
 import type { EventStore } from '../storage/types'
+import { safeParseJson } from './sessions'
+
+describe('safeParseJson', () => {
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+
+  test('returns null for null/undefined', () => {
+    expect(safeParseJson(null, 'x')).toBeNull()
+    expect(safeParseJson(undefined, 'x')).toBeNull()
+  })
+
+  test('returns null for non-string input', () => {
+    expect(safeParseJson(123, 'x')).toBeNull()
+    expect(safeParseJson({ already: 'object' }, 'x')).toBeNull()
+  })
+
+  test('parses valid JSON', () => {
+    expect(safeParseJson('{"a":1}', 'x')).toEqual({ a: 1 })
+    expect(safeParseJson('[1,2,3]', 'x')).toEqual([1, 2, 3])
+  })
+
+  test('returns null and warns on corrupt JSON', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    expect(safeParseJson('{not-json', 'event 42 payload')).toBeNull()
+    expect(warn).toHaveBeenCalledTimes(1)
+    expect(warn.mock.calls[0]?.[0]).toMatch(/corrupt event 42 payload JSON dropped/)
+  })
+})
 
 type Env = {
   Variables: {
@@ -217,6 +246,56 @@ describe('GET /api/sessions/:id/events — fields= allow-list', () => {
         _meta: { foo: 'bar' },
       },
     ])
+  })
+
+  test('corrupt payload JSON does not crash the endpoint (returns null payload)', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    mockStore.getEventsForSession.mockResolvedValue([
+      {
+        id: 99,
+        agent_id: 'agent-1',
+        session_id: 'sess-1',
+        hook_name: 'PreToolUse',
+        timestamp: 1000,
+        created_at: 2000,
+        cwd: '/tmp',
+        _meta: null,
+        payload: '{not-json',
+      },
+    ])
+    mockStore.getSessionById.mockResolvedValue({ stopped_at: null })
+
+    const res = await app.request('/api/sessions/sess-1/events')
+    expect(res.status).toBe(200)
+    const body = await res.json()
+    expect(body[0].payload).toBeNull()
+    expect(warn).toHaveBeenCalled()
+    warn.mockRestore()
+  })
+
+  test('corrupt _meta JSON in opt-in field returns null _meta, not 500', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    mockStore.getEventsForSession.mockResolvedValue([
+      {
+        id: 1,
+        agent_id: 'agent-1',
+        session_id: 'sess-1',
+        hook_name: 'PreToolUse',
+        timestamp: 1000,
+        created_at: 2000,
+        cwd: '/tmp',
+        _meta: '{bad',
+        payload: '{}',
+      },
+    ])
+    mockStore.getSessionById.mockResolvedValue({ stopped_at: null })
+
+    const res = await app.request('/api/sessions/sess-1/events?fields=_meta')
+    expect(res.status).toBe(200)
+    const body = await res.json()
+    expect(body[0]._meta).toBeNull()
+    expect(warn).toHaveBeenCalled()
+    warn.mockRestore()
   })
 
   test('unknown fields in fields= are ignored', async () => {
