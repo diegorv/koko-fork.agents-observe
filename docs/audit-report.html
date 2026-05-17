@@ -1,0 +1,1260 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Code Audit Report — Agents Observe</title>
+    <style>
+      :root {
+        --bg: #ffffff;
+        --bg-soft: #fafafa;
+        --bg-code: #f6f7f9;
+        --text: #1a1a1a;
+        --text-soft: #555;
+        --text-muted: #888;
+        --border: #e5e5e5;
+        --border-strong: #cfcfcf;
+        --p0: #c53030;
+        --p0-bg: #fff5f5;
+        --p1: #b7791f;
+        --p1-bg: #fffaf0;
+        --p2: #2b6cb0;
+        --p2-bg: #f3f8fd;
+        --p3: #555;
+        --p3-bg: #f5f5f5;
+        --ok: #2f855a;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        background: var(--bg);
+        color: var(--text);
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+          Arial, sans-serif;
+        font-size: 15px;
+        line-height: 1.55;
+      }
+
+      a {
+        color: var(--p2);
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+
+      .wrap {
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 48px 28px 96px;
+      }
+
+      header.page {
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 24px;
+        margin-bottom: 32px;
+      }
+      header.page h1 {
+        margin: 0 0 6px;
+        font-size: 28px;
+        letter-spacing: -0.01em;
+      }
+      header.page .sub {
+        color: var(--text-soft);
+        font-size: 14px;
+      }
+      header.page .meta {
+        margin-top: 14px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 18px;
+        font-size: 13px;
+        color: var(--text-muted);
+      }
+      header.page .meta span strong {
+        color: var(--text);
+        font-weight: 600;
+      }
+
+      section {
+        margin: 40px 0;
+      }
+
+      h2 {
+        font-size: 20px;
+        margin: 0 0 14px;
+        letter-spacing: -0.005em;
+      }
+      h3 {
+        font-size: 16px;
+        margin: 28px 0 12px;
+        color: var(--text-soft);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+      }
+
+      .grid {
+        display: grid;
+        gap: 14px;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      }
+
+      .stat {
+        background: var(--bg-soft);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 14px 16px;
+      }
+      .stat .label {
+        font-size: 12px;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+      .stat .value {
+        font-size: 24px;
+        font-weight: 600;
+        margin-top: 4px;
+      }
+      .stat.p0 .value {
+        color: var(--p0);
+      }
+      .stat.p1 .value {
+        color: var(--p1);
+      }
+      .stat.p2 .value {
+        color: var(--p2);
+      }
+      .stat.p3 .value {
+        color: var(--p3);
+      }
+
+      .legend {
+        background: var(--bg-soft);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 16px 18px;
+        font-size: 14px;
+        color: var(--text-soft);
+      }
+      .legend p {
+        margin: 0 0 6px;
+      }
+      .legend ul {
+        margin: 6px 0 0;
+        padding-left: 22px;
+      }
+      .legend li {
+        margin: 2px 0;
+      }
+
+      .finding {
+        border: 1px solid var(--border);
+        border-left-width: 4px;
+        border-radius: 6px;
+        background: var(--bg);
+        padding: 18px 20px;
+        margin: 14px 0;
+      }
+      .finding.p0 {
+        border-left-color: var(--p0);
+      }
+      .finding.p1 {
+        border-left-color: var(--p1);
+      }
+      .finding.p2 {
+        border-left-color: var(--p2);
+      }
+      .finding.p3 {
+        border-left-color: var(--p3);
+      }
+
+      .finding header {
+        display: flex;
+        align-items: baseline;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 6px;
+      }
+      .finding header .num {
+        font-size: 13px;
+        color: var(--text-muted);
+        font-variant-numeric: tabular-nums;
+        min-width: 28px;
+      }
+      .finding header h4 {
+        margin: 0;
+        font-size: 16px;
+        flex: 1 1 auto;
+      }
+
+      .badge {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        line-height: 1.5;
+      }
+      .badge.p0 {
+        color: var(--p0);
+        background: var(--p0-bg);
+        border: 1px solid var(--p0);
+      }
+      .badge.p1 {
+        color: var(--p1);
+        background: var(--p1-bg);
+        border: 1px solid var(--p1);
+      }
+      .badge.p2 {
+        color: var(--p2);
+        background: var(--p2-bg);
+        border: 1px solid var(--p2);
+      }
+      .badge.p3 {
+        color: var(--p3);
+        background: var(--p3-bg);
+        border: 1px solid var(--border-strong);
+      }
+
+      .loc {
+        font-family:
+          ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+        font-size: 12.5px;
+        color: var(--text-soft);
+        background: var(--bg-code);
+        border: 1px solid var(--border);
+        padding: 1px 6px;
+        border-radius: 4px;
+      }
+
+      .meta-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 18px;
+        font-size: 13px;
+        color: var(--text-soft);
+        margin: 6px 0 12px;
+      }
+      .meta-row strong {
+        color: var(--text);
+        font-weight: 600;
+      }
+
+      .finding dl {
+        margin: 0;
+        display: grid;
+        grid-template-columns: 92px 1fr;
+        gap: 6px 14px;
+      }
+      .finding dt {
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--text-muted);
+        padding-top: 2px;
+      }
+      .finding dd {
+        margin: 0;
+        font-size: 14.5px;
+      }
+
+      pre,
+      code {
+        font-family:
+          ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+      }
+      pre {
+        background: var(--bg-code);
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        padding: 10px 12px;
+        font-size: 12.5px;
+        overflow-x: auto;
+        white-space: pre-wrap;
+        word-break: break-word;
+        margin: 0;
+      }
+      code {
+        font-size: 12.5px;
+      }
+
+      footer.page {
+        margin-top: 56px;
+        padding-top: 24px;
+        border-top: 1px solid var(--border);
+        font-size: 13px;
+        color: var(--text-muted);
+      }
+      footer.page h3 {
+        color: var(--text-soft);
+        margin-top: 0;
+      }
+      footer.page ul {
+        padding-left: 20px;
+      }
+      footer.page li {
+        margin: 4px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header class="page">
+        <h1>Code Audit Report — Agents Observe</h1>
+        <div class="sub">
+          Static read-only review of the React / TypeScript / Node codebase.
+          Findings ordered by priority using an
+          <em>impact &times; complexity</em> matrix &mdash; quick high-value
+          wins first.
+        </div>
+        <div class="meta">
+          <span><strong>Repository:</strong> koko-fork-agents-observe</span>
+          <span><strong>Version:</strong> 0.9.7</span>
+          <span><strong>Date:</strong> 2026-05-17</span>
+          <span
+            ><strong>Scope:</strong> app/server, app/client, hooks/, infra
+            (Docker, CI, scripts)</span
+          >
+          <span><strong>Findings:</strong> 23 validated</span>
+        </div>
+      </header>
+
+      <section>
+        <h2>Summary</h2>
+        <div class="grid">
+          <div class="stat p0">
+            <div class="label">P0 &middot; Fix now</div>
+            <div class="value">7</div>
+          </div>
+          <div class="stat p1">
+            <div class="label">P1 &middot; Quick wins</div>
+            <div class="value">7</div>
+          </div>
+          <div class="stat p2">
+            <div class="label">P2 &middot; Architecture</div>
+            <div class="value">5</div>
+          </div>
+          <div class="stat p3">
+            <div class="label">P3 &middot; Nice-to-have</div>
+            <div class="value">4</div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2>Methodology &amp; priority key</h2>
+        <div class="legend">
+          <p>
+            Three parallel exploration passes covered server + hooks, client
+            React/TS, and infra/build/CI. Every reported finding was opened in
+            source and confirmed in context to reduce false positives. Three
+            initial sub-agent claims were dropped after verification &mdash;
+            see the bottom of the report.
+          </p>
+          <p>Buckets:</p>
+          <ul>
+            <li>
+              <strong>P0 &middot; Fix now</strong> &mdash; high impact, low
+              complexity. Correctness, data loss, or security risk that ships
+              today.
+            </li>
+            <li>
+              <strong>P1 &middot; Quick wins</strong> &mdash; medium impact,
+              low complexity. Cheap to fix, payoff is large relative to cost.
+            </li>
+            <li>
+              <strong>P2 &middot; Architecture</strong> &mdash; medium impact,
+              medium complexity. Worth planning into a sprint.
+            </li>
+            <li>
+              <strong>P3 &middot; Nice-to-have</strong> &mdash; low impact.
+              Tidy-up when convenient.
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <section>
+        <h2>P0 &middot; Fix now</h2>
+
+        <article class="finding p0">
+          <header>
+            <span class="num">01</span>
+            <span class="badge p0">P0</span>
+            <h4>Unhandled rejection on startup repair</h4>
+            <span class="loc">app/server/src/index.ts:15-30</span>
+          </header>
+          <div class="meta-row">
+            <span><strong>Impact:</strong> High</span>
+            <span><strong>Complexity:</strong> Low</span>
+            <span><strong>Area:</strong> Server / startup</span>
+          </div>
+          <dl>
+            <dt>Problem</dt>
+            <dd>
+              <code>store.repairOrphans().then(...)</code> at module scope has
+              no <code>.catch()</code>. If repair throws (e.g. DB corruption,
+              FS error) Node logs an
+              <code>unhandledRejection</code> warning and the server proceeds
+              with potentially unsafe state. No structured error surface.
+            </dd>
+            <dt>Evidence</dt>
+            <dd>
+              <pre>store.repairOrphans().then((result) =&gt; {
+  const total = result.sessionsReassigned + ...
+  if (total &gt; 0) {
+    console.log(`[startup] Repaired orphaned rows: ...`)
+  }
+})</pre>
+            </dd>
+            <dt>Fix</dt>
+            <dd>
+              Add <code>.catch(err =&gt; { console.error('[startup] repair
+              failed', err); process.exit(1) })</code> &mdash; or
+              <code>await</code> the call inside an
+              <code>async</code> bootstrap that the rest of the server depends
+              on.
+            </dd>
+          </dl>
+        </article>
+
+        <article class="finding p0">
+          <header>
+            <span class="num">02</span>
+            <span class="badge p0">P0</span>
+            <h4>Backup can silently overwrite the live database</h4>
+            <span class="loc">app/server/src/routes/admin.ts:106-119</span>
+          </header>
+          <div class="meta-row">
+            <span><strong>Impact:</strong> Critical (data loss)</span>
+            <span><strong>Complexity:</strong> Low</span>
+            <span><strong>Area:</strong> Server / admin</span>
+          </div>
+          <dl>
+            <dt>Problem</dt>
+            <dd>
+              <code>dbPath.replace(/\.db$/, ...)</code> returns the input
+              <em>unchanged</em> when <code>config.dbPath</code> does not end
+              in <code>.db</code> (e.g. <code>observe</code>, or a custom path
+              without an extension). The subsequent
+              <code>copyFileSync(dbPath, backupPath)</code> then copies the
+              file onto itself &mdash; or worse, fails partway and corrupts
+              it &mdash; before <code>clearAllData()</code> runs.
+            </dd>
+            <dt>Evidence</dt>
+            <dd>
+              <pre>const backupPath = dbPath.replace(/\.db$/, `-${timestamp}.bak.db`)
+try {
+  copyFileSync(dbPath, backupPath)
+} catch (err) {
+  return apiError(c, 500, 'Failed to create database backup before reset', ...)
+}</pre>
+            </dd>
+            <dt>Fix</dt>
+            <dd>
+              Build the backup path with
+              <code>path.join(path.dirname(dbPath), `${path.basename(dbPath,
+              path.extname(dbPath))}-${timestamp}.bak.db`)</code>, or assert
+              <code>dbPath.endsWith('.db')</code> and 400 otherwise. Also
+              assert <code>backupPath !== dbPath</code>.
+            </dd>
+          </dl>
+        </article>
+
+        <article class="finding p0">
+          <header>
+            <span class="num">03</span>
+            <span class="badge p0">P0</span>
+            <h4>Silent <code>catch {}</code> on WebSocket JSON parses</h4>
+            <span class="loc"
+              >app/server/src/websocket.ts:21-40, app/client/src/hooks/use-websocket.ts:232-237</span
+            >
+          </header>
+          <div class="meta-row">
+            <span><strong>Impact:</strong> High</span>
+            <span><strong>Complexity:</strong> Low</span>
+            <span><strong>Area:</strong> WS transport</span>
+          </div>
+          <dl>
+            <dt>Problem</dt>
+            <dd>
+              Both ends of the WS pipe wrap message parsing in
+              <code>try { JSON.parse(...) } catch {}</code>. Malformed frames
+              are dropped with no log, no metric, no client/server feedback.
+              Whole categories of regressions (encoding bugs, partial frames,
+              schema drift) become invisible.
+            </dd>
+            <dt>Evidence</dt>
+            <dd>
+              <pre>// server
+ws.on('message', (raw) =&gt; {
+  try {
+    const msg: WSClientMessage = JSON.parse(raw.toString())
+    ...
+  } catch {}
+})
+
+// client
+ws.onmessage = (wsEvent) =&gt; {
+  try {
+    const msg: WSMessage = JSON.parse(wsEvent.data)
+    handleMessage(msg)
+  } catch {}
+}</pre>
+            </dd>
+            <dt>Fix</dt>
+            <dd>
+              Log the parse error (truncated payload + length). Optionally
+              close the connection after N consecutive parse failures on
+              either side.
+            </dd>
+          </dl>
+        </article>
+
+        <article class="finding p0">
+          <header>
+            <span class="num">04</span>
+            <span class="badge p0">P0</span>
+            <h4>Unvalidated <code>parseInt</code> + unbounded <code>limit</code></h4>
+            <span class="loc">app/server/src/routes/sessions.ts:126-134</span>
+          </header>
+          <div class="meta-row">
+            <span><strong>Impact:</strong> High (correctness + DoS)</span>
+            <span><strong>Complexity:</strong> Low</span>
+            <span><strong>Area:</strong> Server / events API</span>
+          </div>
+          <dl>
+            <dt>Problem</dt>
+            <dd>
+              <code>parseInt(c.req.query('limit')!)</code>,
+              <code>parseInt(c.req.query('offset')!)</code> and
+              <code>parseInt(sinceParam)</code> are sent straight to the DB
+              layer with no <code>isNaN</code> check and no upper bound on
+              <code>limit</code>. <code>?limit=999999</code> loads the entire
+              event table into memory; <code>?since=abc</code> yields
+              <code>NaN</code> bound to a SQL parameter.
+            </dd>
+            <dt>Evidence</dt>
+            <dd>
+              <pre>const rows = sinceParam
+  ? await store.getEventsSince(sessionId, parseInt(sinceParam))
+  : await store.getEventsForSession(sessionId, {
+      ...
+      limit: c.req.query('limit') ? parseInt(c.req.query('limit')!) : undefined,
+      offset: c.req.query('offset') ? parseInt(c.req.query('offset')!) : undefined,
+    })</pre>
+            </dd>
+            <dt>Fix</dt>
+            <dd>
+              Centralise an integer-query helper:
+              <code>parsePositiveInt(value, { max?, default? })</code> that
+              returns a typed result or 400s. Cap <code>limit</code> to e.g.
+              500 and reject <code>NaN</code>/negative values.
+            </dd>
+          </dl>
+        </article>
+
+        <article class="finding p0">
+          <header>
+            <span class="num">05</span>
+            <span class="badge p0">P0</span>
+            <h4>
+              <code>JSON.parse</code> in event-mapping loop has no try/catch
+            </h4>
+            <span class="loc">app/server/src/routes/sessions.ts:145-158</span>
+          </header>
+          <div class="meta-row">
+            <span><strong>Impact:</strong> High (whole endpoint crash)</span>
+            <span><strong>Complexity:</strong> Low</span>
+            <span><strong>Area:</strong> Server / events API</span>
+          </div>
+          <dl>
+            <dt>Problem</dt>
+            <dd>
+              <code>JSON.parse(r.payload)</code> and
+              <code>JSON.parse(r._meta)</code> are called for every event row.
+              A single corrupted row (truncated write, partial flush) throws
+              synchronously and rejects the entire request. The response is
+              all-or-nothing.
+            </dd>
+            <dt>Evidence</dt>
+            <dd>
+              <pre>const events: EventRow[] = rows.map((r) =&gt; {
+  const base: EventRow = {
+    ...
+    payload: JSON.parse(r.payload),
+  }
+  ...
+  if (requested.has('_meta')) base._meta = r._meta ? JSON.parse(r._meta) : null
+  return base
+})</pre>
+            </dd>
+            <dt>Fix</dt>
+            <dd>
+              Wrap each parse in a helper
+              <code>safeParse(json: string | null): unknown | null</code> that
+              returns <code>null</code> on failure and logs once. Surface the
+              corrupt row's id in the log so a follow-up cleanup is possible.
+            </dd>
+          </dl>
+        </article>
+
+        <article class="finding p0">
+          <header>
+            <span class="num">06</span>
+            <span class="badge p0">P0</span>
+            <h4>Dependabot config is a stub &mdash; no updates monitored</h4>
+            <span class="loc">.github/dependabot.yml:7-11</span>
+          </header>
+          <div class="meta-row">
+            <span><strong>Impact:</strong> High (security drift)</span>
+            <span><strong>Complexity:</strong> Low</span>
+            <span><strong>Area:</strong> CI / supply chain</span>
+          </div>
+          <dl>
+            <dt>Problem</dt>
+            <dd>
+              <code>package-ecosystem: ""</code> is the un-edited template
+              default. Dependabot is effectively disabled. With four
+              <code>package.json</code> manifests (root, server, client,
+              tests) plus the Dockerfile and GitHub Actions, nothing is being
+              auto-bumped or alerted on.
+            </dd>
+            <dt>Evidence</dt>
+            <dd>
+              <pre>updates:
+  - package-ecosystem: "" # See documentation for possible values
+    directory: "/" # Location of package manifests
+    schedule:
+      interval: "weekly"</pre>
+            </dd>
+            <dt>Fix</dt>
+            <dd>
+              Add explicit entries for <code>npm</code> in
+              <code>/</code>, <code>/app/server</code>,
+              <code>/app/client</code>, plus <code>docker</code> for
+              <code>/</code> and <code>github-actions</code> for
+              <code>/</code>. Group dev-deps to reduce PR noise.
+            </dd>
+          </dl>
+        </article>
+
+        <article class="finding p0">
+          <header>
+            <span class="num">07</span>
+            <span class="badge p0">P0</span>
+            <h4>Hook wrapper always exits 0 &mdash; failures invisible</h4>
+            <span class="loc">hooks/scripts/hook.sh:1-9</span>
+          </header>
+          <div class="meta-row">
+            <span><strong>Impact:</strong> Medium-High</span>
+            <span><strong>Complexity:</strong> Low</span>
+            <span><strong>Area:</strong> Hooks / observability</span>
+          </div>
+          <dl>
+            <dt>Problem</dt>
+            <dd>
+              The wrapper backgrounds the node CLI and unconditionally
+              <code>exit 0</code>. If <code>node</code> is missing, the script
+              path is wrong, or <code>observe_cli.mjs</code> throws on
+              startup, Claude Code still sees a successful hook and the user
+              loses observability silently &mdash; the very thing this product
+              is supposed to provide.
+            </dd>
+            <dt>Evidence</dt>
+            <dd>
+              <pre>input=$(cat)
+echo "$input" | node "$SCRIPT_DIR/observe_cli.mjs" hook &gt; /dev/null 2&gt;&amp;1 &amp;
+exit 0</pre>
+            </dd>
+            <dt>Fix</dt>
+            <dd>
+              Validate <code>command -v node</code> and the existence of
+              <code>observe_cli.mjs</code> before backgrounding. Write a tiny
+              breadcrumb to <code>~/.claude/logs/observe-hook.log</code> on
+              failure. Keep the fast-exit behaviour for the success path.
+            </dd>
+          </dl>
+        </article>
+      </section>
+
+      <section>
+        <h2>P1 &middot; Quick wins</h2>
+
+        <article class="finding p1">
+          <header>
+            <span class="num">08</span>
+            <span class="badge p1">P1</span>
+            <h4><code>start.mjs</code> uses <code>npm install</code> &mdash; lockfile drift</h4>
+            <span class="loc">start.mjs:36-37</span>
+          </header>
+          <div class="meta-row">
+            <span><strong>Impact:</strong> Medium</span>
+            <span><strong>Complexity:</strong> Low</span>
+            <span><strong>Area:</strong> Tooling</span>
+          </div>
+          <dl>
+            <dt>Problem</dt>
+            <dd>
+              The local launcher runs <code>npm install</code> on every start,
+              which can mutate <code>package-lock.json</code>. CI and the
+              Dockerfile use <code>npm ci</code>. Result: local installs
+              gradually drift from the reproducible build.
+            </dd>
+            <dt>Evidence</dt>
+            <dd>
+              <pre>// 1. Install dependencies
+run('npm', ['install'], serverDir)
+run('npm', ['install'], clientDir)</pre>
+            </dd>
+            <dt>Fix</dt>
+            <dd>
+              Switch to <code>npm ci --no-audit --no-fund</code>. Keep a
+              <code>just install</code> recipe for the rare case where a dev
+              wants to add a dep.
+            </dd>
+          </dl>
+        </article>
+
+        <article class="finding p1">
+          <header>
+            <span class="num">09</span>
+            <span class="badge p1">P1</span>
+            <h4>Hot-path http helper swallows JSON errors</h4>
+            <span class="loc">hooks/scripts/lib/http.mjs:34-38</span>
+          </header>
+          <div class="meta-row">
+            <span><strong>Impact:</strong> Medium</span>
+            <span><strong>Complexity:</strong> Low</span>
+            <span><strong>Area:</strong> Hooks transport</span>
+          </div>
+          <dl>
+            <dt>Problem</dt>
+            <dd>
+              On parse failure the helper returns the raw string as
+              <code>body</code>. Callers expect an object &mdash; downstream
+              type-confusion manifests as obscure crashes far from the source.
+            </dd>
+            <dt>Fix</dt>
+            <dd>
+              Return a clearly-typed shape:
+              <code>{ status, body: null, parseError: e.message }</code>. Log
+              once with truncated raw text.
+            </dd>
+          </dl>
+        </article>
+
+        <article class="finding p1">
+          <header>
+            <span class="num">10</span>
+            <span class="badge p1">P1</span>
+            <h4>Missing <code>noUncheckedIndexedAccess</code></h4>
+            <span class="loc"
+              >app/server/tsconfig.json, app/client/tsconfig.app.json</span
+            >
+          </header>
+          <div class="meta-row">
+            <span><strong>Impact:</strong> Medium</span>
+            <span><strong>Complexity:</strong> Low &mdash; Medium (depending on fallout)</span>
+            <span><strong>Area:</strong> Types</span>
+          </div>
+          <dl>
+            <dt>Problem</dt>
+            <dd>
+              Both configs enable <code>strict</code> but omit
+              <code>noUncheckedIndexedAccess</code>. Indexing
+              <code>arr[i]</code> / <code>map[k]</code> returns
+              <code>T</code> rather than <code>T | undefined</code>, hiding a
+              broad family of off-by-one and missing-key bugs that show up at
+              runtime.
+            </dd>
+            <dt>Fix</dt>
+            <dd>
+              Flip the flag, run <code>tsc --noEmit</code>, fix the fallout
+              behind a small refactor PR. Most call sites will need an
+              explicit guard or a non-null assertion with a comment.
+            </dd>
+          </dl>
+        </article>
+
+        <article class="finding p1">
+          <header>
+            <span class="num">11</span>
+            <span class="badge p1">P1</span>
+            <h4><code>as any</code> hides SessionStart payload shape</h4>
+            <span class="loc"
+              >app/client/src/hooks/use-permission-mode-backfill.ts:42, 55</span
+            >
+          </header>
+          <div class="meta-row">
+            <span><strong>Impact:</strong> Medium</span>
+            <span><strong>Complexity:</strong> Low</span>
+            <span><strong>Area:</strong> Client types</span>
+          </div>
+          <dl>
+            <dt>Problem</dt>
+            <dd>
+              Two <code>e.payload as any</code> casts to read
+              <code>permission_mode</code> /
+              <code>permissionMode</code>. If the SessionStart payload schema
+              evolves on the server, the client compiles fine and breaks at
+              runtime.
+            </dd>
+            <dt>Fix</dt>
+            <dd>
+              Declare
+              <code>type SessionStartPayload = { permission_mode?: string;
+              permissionMode?: string }</code>
+              and cast through that. Better: add a tiny zod/typia parser at
+              the WS boundary.
+            </dd>
+          </dl>
+        </article>
+
+        <article class="finding p1">
+          <header>
+            <span class="num">12</span>
+            <span class="badge p1">P1</span>
+            <h4>Filter-config <code>JSON.parse</code> swallowed silently</h4>
+            <span class="loc"
+              >app/server/src/storage/sqlite-adapter.ts:1360-1373</span
+            >
+          </header>
+          <div class="meta-row">
+            <span><strong>Impact:</strong> Medium</span>
+            <span><strong>Complexity:</strong> Low</span>
+            <span><strong>Area:</strong> Server / storage</span>
+          </div>
+          <dl>
+            <dt>Problem</dt>
+            <dd>
+              A corrupt <code>config</code> column becomes
+              <code>{}</code> with no log. Users see filters mysteriously stop
+              working with no breadcrumb back to the bad row.
+            </dd>
+            <dt>Fix</dt>
+            <dd>
+              Log <code>console.warn('[storage] filter ${id} has invalid
+              config', err)</code> in the catch arm. Consider quarantining the
+              row with a flag instead of returning empty config.
+            </dd>
+          </dl>
+        </article>
+
+        <article class="finding p1">
+          <header>
+            <span class="num">13</span>
+            <span class="badge p1">P1</span>
+            <h4>Consumer sweep timer not cleared on graceful shutdown</h4>
+            <span class="loc">app/server/src/consumer-tracker.ts:12-36</span>
+          </header>
+          <div class="meta-row">
+            <span><strong>Impact:</strong> Low-Medium</span>
+            <span><strong>Complexity:</strong> Low</span>
+            <span><strong>Area:</strong> Lifecycle</span>
+          </div>
+          <dl>
+            <dt>Problem</dt>
+            <dd>
+              <code>sweepTimer</code> is only cleared inside the auto-shutdown
+              branch of <code>setTimeout</code>. There is no SIGTERM/SIGINT
+              handler that stops the interval, so the process can hold itself
+              open one extra sweep tick under graceful shutdown and orphan a
+              child of the test runner.
+            </dd>
+            <dt>Fix</dt>
+            <dd>
+              Export <code>stopConsumerSweep()</code> and call it from a
+              top-level signal handler in
+              <code>app/server/src/index.ts</code> alongside
+              <code>server.close()</code>.
+            </dd>
+          </dl>
+        </article>
+
+        <article class="finding p1">
+          <header>
+            <span class="num">14</span>
+            <span class="badge p1">P1</span>
+            <h4>API client throws raw <code>SyntaxError</code> on non-JSON 5xx</h4>
+            <span class="loc">app/client/src/lib/api-client.ts:66</span>
+          </header>
+          <div class="meta-row">
+            <span><strong>Impact:</strong> Medium</span>
+            <span><strong>Complexity:</strong> Low</span>
+            <span><strong>Area:</strong> Client transport</span>
+          </div>
+          <dl>
+            <dt>Problem</dt>
+            <dd>
+              <code>return res.json()</code> with no try/catch. A reverse
+              proxy 502 (HTML body) or empty 504 body crashes the calling
+              hook with a <code>SyntaxError</code> instead of the
+              <code>ApiError</code> the rest of the UI handles.
+            </dd>
+            <dt>Fix</dt>
+            <dd>
+              Wrap parse in try/catch and re-throw as
+              <code>new ApiError(res.status, path, 'Invalid JSON response',
+              raw.slice(0, 256))</code>.
+            </dd>
+          </dl>
+        </article>
+      </section>
+
+      <section>
+        <h2>P2 &middot; Architecture &amp; performance</h2>
+
+        <article class="finding p2">
+          <header>
+            <span class="num">15</span>
+            <span class="badge p2">P2</span>
+            <h4>
+              <code>extractResultText(toolResponse: any)</code> &mdash;
+              untyped tool-response handling
+            </h4>
+            <span class="loc"
+              >app/client/src/agents/claude-code/process-event.ts:392</span
+            >
+          </header>
+          <div class="meta-row">
+            <span><strong>Impact:</strong> Medium</span>
+            <span><strong>Complexity:</strong> Medium</span>
+            <span><strong>Area:</strong> Client domain</span>
+          </div>
+          <dl>
+            <dt>Problem</dt>
+            <dd>
+              A central rendering helper accepts
+              <code>any</code> and probes shape with optional chaining. As
+              tool responses gain new shapes nothing surfaces statically,
+              and the function quietly returns <code>null</code> on the
+              ones it does not recognise.
+            </dd>
+            <dt>Fix</dt>
+            <dd>
+              Define a discriminated union of the response shapes Claude
+              Code actually emits (string, <code>{ stdout }</code>,
+              <code>{ content: Array&lt;{ type: string; text?: string
+              }&gt; }</code>, etc.) and switch on the discriminant. Surfaces
+              new shapes as exhaustiveness errors at compile time.
+            </dd>
+          </dl>
+        </article>
+
+        <article class="finding p2">
+          <header>
+            <span class="num">16</span>
+            <span class="badge p2">P2</span>
+            <h4>
+              Rewind-mode scroll listener closes over stale
+              <code>filteredEvents</code>
+            </h4>
+            <span class="loc"
+              >app/client/src/components/event-stream/event-stream.tsx:248-274</span
+            >
+          </header>
+          <div class="meta-row">
+            <span><strong>Impact:</strong> Medium</span>
+            <span><strong>Complexity:</strong> Medium</span>
+            <span><strong>Area:</strong> Client / virtualizer</span>
+          </div>
+          <dl>
+            <dt>Problem</dt>
+            <dd>
+              <code>syncTimelineFromScroll</code> closes over
+              <code>filteredEvents</code>. The
+              <code>useEffect</code> below re-attaches the scroll listener on
+              every change, but in rewind mode &mdash; with rapid timeline
+              jumps &mdash; the &lsquo;old&rsquo; listener can still fire
+              against the previous array between attach/detach.
+            </dd>
+            <dt>Fix</dt>
+            <dd>
+              Track latest events via a ref:
+              <code>const filteredEventsRef = useRef(filteredEvents)</code>,
+              update in a sync effect, and have
+              <code>syncTimelineFromScroll</code> read from the ref. Then the
+              listener can be attached once for the lifetime of rewind mode.
+            </dd>
+          </dl>
+        </article>
+
+        <article class="finding p2">
+          <header>
+            <span class="num">17</span>
+            <span class="badge p2">P2</span>
+            <h4>
+              <code>expandAllCounter</code> effect drops two dependencies
+              without comment
+            </h4>
+            <span class="loc"
+              >app/client/src/components/event-stream/event-stream.tsx:241-245</span
+            >
+          </header>
+          <div class="meta-row">
+            <span><strong>Impact:</strong> Medium</span>
+            <span><strong>Complexity:</strong> Low</span>
+            <span><strong>Area:</strong> Client / hooks</span>
+          </div>
+          <dl>
+            <dt>Problem</dt>
+            <dd>
+              The effect calls <code>expandAllEvents(filteredEvents.map(...))</code>
+              but the dep array is just <code>[expandAllCounter]</code>, no
+              <code>// eslint-disable</code> rationale attached. The
+              zustand action is stable today &mdash; but the
+              <code>filteredEvents</code> snapshot the call uses is
+              whichever render last committed, which may already be stale
+              after a fast filter change.
+            </dd>
+            <dt>Fix</dt>
+            <dd>
+              Either (a) include
+              <code>filteredEvents</code> in the deps and accept the extra
+              fire, or (b) make
+              <code>expandAllEvents</code> read the latest list from the
+              store itself, removing the closure over component state.
+            </dd>
+          </dl>
+        </article>
+
+        <article class="finding p2">
+          <header>
+            <span class="num">18</span>
+            <span class="badge p2">P2</span>
+            <h4>Schema migrations driven by <code>PRAGMA table_info</code></h4>
+            <span class="loc"
+              >app/server/src/storage/sqlite-adapter.ts (migration block ~44-68)</span
+            >
+          </header>
+          <div class="meta-row">
+            <span><strong>Impact:</strong> Medium</span>
+            <span><strong>Complexity:</strong> Medium</span>
+            <span><strong>Area:</strong> Storage / lifecycle</span>
+          </div>
+          <dl>
+            <dt>Problem</dt>
+            <dd>
+              Schema upgrades are inferred from column presence rather than
+              tracked in a <code>migrations</code> table. Idempotency is
+              implicit. As soon as a second mutation depends on the first, the
+              ordering becomes brittle and migration code starts asserting on
+              database <em>shape</em> instead of declared version.
+            </dd>
+            <dt>Fix</dt>
+            <dd>
+              Add a <code>schema_migrations(id INTEGER PRIMARY KEY, name TEXT,
+              applied_at INTEGER)</code> table. Name files
+              <code>001_drop_columns.sql</code>, <code>002_...</code>, and
+              apply in order, skipping rows already present.
+            </dd>
+          </dl>
+        </article>
+
+        <article class="finding p2">
+          <header>
+            <span class="num">19</span>
+            <span class="badge p2">P2</span>
+            <h4>Sidebar drag leaks listeners on unmount mid-drag</h4>
+            <span class="loc"
+              >app/client/src/components/sidebar/sidebar.tsx:31-58</span
+            >
+          </header>
+          <div class="meta-row">
+            <span><strong>Impact:</strong> Low-Medium</span>
+            <span><strong>Complexity:</strong> Low</span>
+            <span><strong>Area:</strong> Client / UI</span>
+          </div>
+          <dl>
+            <dt>Problem</dt>
+            <dd>
+              <code>handleMouseDown</code> attaches
+              <code>mousemove</code> and <code>mouseup</code> to
+              <code>document</code> and removes them only inside the
+              <code>mouseup</code> handler. If the component unmounts (or the
+              tree re-keys) mid-drag, those listeners stay attached and
+              continue to call into a stale setter closure.
+            </dd>
+            <dt>Fix</dt>
+            <dd>
+              Add a <code>useEffect</code> that returns a cleanup removing
+              both listeners, or refactor to keep the &lsquo;dragging&rsquo;
+              flag in component state and bind/unbind via effect.
+            </dd>
+          </dl>
+        </article>
+      </section>
+
+      <section>
+        <h2>P3 &middot; Nice-to-have</h2>
+
+        <article class="finding p3">
+          <header>
+            <span class="num">20</span>
+            <span class="badge p3">P3</span>
+            <h4>Vite build output not content-hashed</h4>
+            <span class="loc">app/client/vite.config.ts</span>
+          </header>
+          <div class="meta-row">
+            <span><strong>Impact:</strong> Low-Medium</span>
+            <span><strong>Complexity:</strong> Low</span>
+            <span><strong>Area:</strong> Client / build</span>
+          </div>
+          <dl>
+            <dt>Problem</dt>
+            <dd>
+              Default Vite output without an explicit hash strategy can
+              leave stale clients talking to a newer server API across
+              redeploys. The CHANGELOG calls out a v0.9.7 release path that
+              touches Docker base images &mdash; cache busting matters there.
+            </dd>
+            <dt>Fix</dt>
+            <dd>
+              Set <code>build.rollupOptions.output</code> to
+              <code>[name].[hash].js</code> for entries and chunks and
+              <code>[name].[hash][extname]</code> for assets. Ensure
+              <code>index.html</code> references the hashed bundle (Vite does
+              this by default once hashes are enabled).
+            </dd>
+          </dl>
+        </article>
+
+        <article class="finding p3">
+          <header>
+            <span class="num">21</span>
+            <span class="badge p3">P3</span>
+            <h4>GitHub Actions pinned to major only</h4>
+            <span class="loc">.github/workflows/*.yml</span>
+          </header>
+          <div class="meta-row">
+            <span><strong>Impact:</strong> Low</span>
+            <span><strong>Complexity:</strong> Low</span>
+            <span><strong>Area:</strong> CI / supply chain</span>
+          </div>
+          <dl>
+            <dt>Problem</dt>
+            <dd>
+              <code>actions/checkout@v5</code> and friends auto-pull any
+              upstream <code>v5.x.y</code>. A compromised or buggy minor
+              release flows in unannounced. Low likelihood, high blast
+              radius if it ever bites.
+            </dd>
+            <dt>Fix</dt>
+            <dd>
+              Pin to full commit SHAs (preferred by SLSA &amp; the GitHub
+              security guide). Configure Dependabot
+              <code>github-actions</code> updates so the SHAs stay current.
+            </dd>
+          </dl>
+        </article>
+
+        <article class="finding p3">
+          <header>
+            <span class="num">22</span>
+            <span class="badge p3">P3</span>
+            <h4>Docker base image not pinned to a digest</h4>
+            <span class="loc">Dockerfile:18-20</span>
+          </header>
+          <div class="meta-row">
+            <span><strong>Impact:</strong> Low</span>
+            <span><strong>Complexity:</strong> Low</span>
+            <span><strong>Area:</strong> Infra</span>
+          </div>
+          <dl>
+            <dt>Problem</dt>
+            <dd>
+              <code>FROM node:24.10-slim</code> follows the upstream tag and
+              gets silently retagged. Comments in the file already note that
+              pinning is preferable.
+            </dd>
+            <dt>Fix</dt>
+            <dd>
+              Resolve once with
+              <code>docker pull node:24.10-slim &amp;&amp; docker inspect
+              --format='{{.RepoDigests}}' node:24.10-slim</code>
+              and use <code>FROM node:24.10-slim@sha256:...</code>. Document
+              the refresh cadence in the release runbook.
+            </dd>
+          </dl>
+        </article>
+
+        <article class="finding p3">
+          <header>
+            <span class="num">23</span>
+            <span class="badge p3">P3</span>
+            <h4>No coverage thresholds in vitest configs</h4>
+            <span class="loc"
+              >vitest.config.ts, app/server/vitest.config.ts,
+              app/client/vitest.config.ts</span
+            >
+          </header>
+          <div class="meta-row">
+            <span><strong>Impact:</strong> Low</span>
+            <span><strong>Complexity:</strong> Low</span>
+            <span><strong>Area:</strong> Testing</span>
+          </div>
+          <dl>
+            <dt>Problem</dt>
+            <dd>
+              No <code>coverage</code> block. Coverage can quietly shrink
+              over time with no signal at PR review.
+            </dd>
+            <dt>Fix</dt>
+            <dd>
+              Run a baseline once
+              (<code>vitest run --coverage</code>), then add
+              <code>coverage: { provider: 'v8', reporter: ['text',
+              'json-summary'], thresholds: { lines: 70, functions: 70,
+              branches: 65, statements: 70 } }</code> &mdash; numbers tuned to
+              the baseline you measure.
+            </dd>
+          </dl>
+        </article>
+      </section>
+
+      <footer class="page">
+        <h3>Verified false positives (dropped from the report)</h3>
+        <ul>
+          <li>
+            <strong>clearAllData FK order</strong> &mdash;
+            <code>app/server/src/storage/sqlite-adapter.ts:1127-1130</code>
+            already deletes in correct FK order (events &rarr; agents &rarr;
+            sessions &rarr; projects). Initial scan claimed otherwise.
+          </li>
+          <li>
+            <strong>Consumer-tracker <code>&gt;</code> vs <code>&gt;=</code></strong>
+            &mdash; <code>consumer-tracker.ts:29</code>. A 1&nbsp;ms boundary
+            difference, not a real bug.
+          </li>
+          <li>
+            <strong>Notification-indicator zustand deps</strong> &mdash;
+            <code>components/sidebar/notification-indicator.tsx:264-268</code>.
+            <code>announce</code> / <code>unannounce</code> from a zustand
+            store have stable identity; listing them as deps is fine.
+          </li>
+          <li>
+            <strong>Admin bulk-delete null body</strong> &mdash;
+            <code>routes/admin.ts:29</code>. <code>body?.sessionIds</code>
+            handles the null safely and the next line 400s on non-array.
+          </li>
+        </ul>
+
+        <p style="margin-top: 24px">
+          Report generated 2026-05-17 from a read-only audit. No code was
+          modified in the course of this review.
+        </p>
+      </footer>
+    </div>
+  </body>
+</html>
