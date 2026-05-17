@@ -10,6 +10,19 @@ const LOG_LEVEL = config.logLevel
 const clientSessions = new Map<WebSocket, string>()
 const allClients = new Set<WebSocket>()
 
+/** Parse an inbound WS frame. Returns null and logs a warning on parse
+ *  failure so malformed frames are visible in server logs rather than
+ *  silently dropped. */
+export function parseClientMessage(raw: string): WSClientMessage | null {
+  try {
+    return JSON.parse(raw) as WSClientMessage
+  } catch (err) {
+    const reason = err instanceof Error ? err.message : String(err)
+    console.warn(`[WS] dropped malformed client message: ${reason} (raw: ${raw.slice(0, 120)})`)
+    return null
+  }
+}
+
 export function attachWebSocket(server: Server) {
   const wss = new WebSocketServer({ server, path: '/api/events/stream' })
 
@@ -19,25 +32,22 @@ export function attachWebSocket(server: Server) {
     console.log(`[WS] Client connected (${allClients.size} total)`)
 
     ws.on('message', (raw) => {
-      try {
-        const msg: WSClientMessage = JSON.parse(raw.toString())
-        if (msg.type === 'subscribe' && msg.sessionId) {
-          const prev = clientSessions.get(ws)
-          clientSessions.set(ws, msg.sessionId)
-          if (LOG_LEVEL === 'debug' || LOG_LEVEL === 'trace') {
-            const prevInfo = prev ? ` (was: ${prev.slice(0, 8)})` : ''
-            console.log(`[WS] Client subscribed to session ${msg.sessionId.slice(0, 8)}${prevInfo}`)
-          }
-        } else if (msg.type === 'unsubscribe') {
-          const prev = clientSessions.get(ws)
-          clientSessions.delete(ws)
-          if (LOG_LEVEL === 'debug' || LOG_LEVEL === 'trace') {
-            console.log(
-              `[WS] Client unsubscribed${prev ? ` from session ${prev.slice(0, 8)}` : ''}`,
-            )
-          }
+      const msg = parseClientMessage(raw.toString())
+      if (!msg) return
+      if (msg.type === 'subscribe' && msg.sessionId) {
+        const prev = clientSessions.get(ws)
+        clientSessions.set(ws, msg.sessionId)
+        if (LOG_LEVEL === 'debug' || LOG_LEVEL === 'trace') {
+          const prevInfo = prev ? ` (was: ${prev.slice(0, 8)})` : ''
+          console.log(`[WS] Client subscribed to session ${msg.sessionId.slice(0, 8)}${prevInfo}`)
         }
-      } catch {}
+      } else if (msg.type === 'unsubscribe') {
+        const prev = clientSessions.get(ws)
+        clientSessions.delete(ws)
+        if (LOG_LEVEL === 'debug' || LOG_LEVEL === 'trace') {
+          console.log(`[WS] Client unsubscribed${prev ? ` from session ${prev.slice(0, 8)}` : ''}`)
+        }
+      }
     })
 
     ws.on('close', () => {

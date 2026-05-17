@@ -5,6 +5,7 @@ import type { WSMessage, WSClientMessage, ParsedEvent, Session, RecentSession } 
 import { pushNotification, clearNotification } from '@/components/sidebar/notification-indicator'
 import { useUIStore } from '@/stores/ui-store'
 import { useFilterStore } from '@/stores/filter-store'
+import { parseWsMessage } from './ws-parse'
 
 /** Patch the ['sessions', *] and ['recent-sessions', *] query caches so
  *  that any row matching sessionId with status='ended' flips to 'active'.
@@ -230,10 +231,8 @@ export function useWebSocket(sessionId: string | null) {
         }
 
         ws.onmessage = (wsEvent) => {
-          try {
-            const msg: WSMessage = JSON.parse(wsEvent.data)
-            handleMessage(msg)
-          } catch {}
+          const msg = parseWsMessage(wsEvent.data)
+          if (msg) handleMessage(msg)
         }
 
         ws.onclose = () => {
