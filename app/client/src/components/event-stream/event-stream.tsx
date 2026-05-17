@@ -112,6 +112,11 @@ export function EventStream() {
     deferredSearchQuery,
   ])
 
+  // Display order: newest first. Keep `filteredEvents` as the chronological
+  // source (oldest -> newest) for timestamp labels and any logic that cares
+  // about time direction; `displayEvents` is what the virtualizer renders.
+  const displayEvents = useMemo(() => filteredEvents.slice().reverse(), [filteredEvents])
+
   const expandedEventIds = useUIStore((s) => s.expandedEventIds)
   const lastExpandedEventId = useUIStore((s) => s.lastExpandedEventId)
   const scrollToEventId = useUIStore((s) => s.scrollToEventId)
@@ -191,14 +196,14 @@ export function EventStream() {
   }, [])
 
   const virtualizer = useVirtualizer({
-    count: filteredEvents.length,
+    count: displayEvents.length,
     getScrollElement: () => scrollRef.current,
     estimateSize: (index) => {
-      const event = filteredEvents[index]
+      const event = displayEvents[index]
       return event && expandedEventIds.has(event.id) ? 200 : 36
     },
     overscan: 10,
-    getItemKey: (index) => filteredEvents[index]?.id ?? index,
+    getItemKey: (index) => displayEvents[index]?.id ?? index,
   })
 
   const virtualItems = virtualizer.getVirtualItems()
@@ -207,35 +212,37 @@ export function EventStream() {
   // No need to track session changes for scroll — the entire component
   // remounts on session change (key={sessionId} in main-panel).
 
-  // Scroll to bottom on initial load and when new events arrive (if autoFollow).
-  // Component remounts on session change, so initial scroll always fires.
+  // Scroll to top on initial load and when new events arrive (if autoFollow).
+  // Newest events render at index 0 (display order is reversed), so "follow
+  // the latest" = scroll to the top. Component remounts on session change,
+  // so initial scroll always fires.
   const hasScrolledRef = useRef(false)
   useEffect(() => {
-    if (filteredEvents.length === 0) return
+    if (displayEvents.length === 0) return
     if (!hasScrolledRef.current || autoFollow) {
-      virtualizer.scrollToIndex(filteredEvents.length - 1, { align: 'end' })
+      virtualizer.scrollToIndex(0, { align: 'start' })
       hasScrolledRef.current = true
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filteredEvents.length, autoFollow])
+  }, [displayEvents.length, autoFollow])
 
   // When the browser tab is re-activated, rAF throttling while hidden can
-  // leave the virtualizer scrolled short of the end. Re-issue scrollToBottom
-  // on visibility change so autoFollow catches up with events that arrived
-  // while the tab was backgrounded.
+  // leave the virtualizer scrolled short of the latest event. Re-issue the
+  // scroll on visibility change so autoFollow catches up with events that
+  // arrived while the tab was backgrounded.
   useEffect(() => {
     const onVisible = () => {
       if (document.visibilityState !== 'visible') return
       if (!autoFollow) return
-      if (filteredEvents.length === 0) return
+      if (displayEvents.length === 0) return
       requestAnimationFrame(() => {
-        virtualizer.scrollToIndex(filteredEvents.length - 1, { align: 'end' })
+        virtualizer.scrollToIndex(0, { align: 'start' })
       })
     }
     document.addEventListener('visibilitychange', onVisible)
     return () => document.removeEventListener('visibilitychange', onVisible)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [autoFollow, filteredEvents.length])
+  }, [autoFollow, displayEvents.length])
 
   // Expand all events when requested from the scope bar
   useEffect(() => {
@@ -252,7 +259,7 @@ export function EventStream() {
     const items = virtualizer.getVirtualItems()
     for (const item of items) {
       if (item.start + item.size > top) {
-        const event = filteredEvents[item.index]
+        const event = displayEvents[item.index]
         if (event) {
           getTimelineScrollTo()?.(event.timestamp)
         }
@@ -260,7 +267,7 @@ export function EventStream() {
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filteredEvents])
+  }, [displayEvents])
 
   useEffect(() => {
     if (!rewindMode) return
@@ -279,14 +286,14 @@ export function EventStream() {
       return
     }
     registerEventStreamScroll((eventId) => {
-      const idx = filteredEvents.findIndex((e) => e.id === eventId)
+      const idx = displayEvents.findIndex((e) => e.id === eventId)
       if (idx >= 0) {
         virtualizer.scrollToIndex(idx, { align: 'start' })
       }
     })
     return () => registerEventStreamScroll(null)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rewindMode, filteredEvents])
+  }, [rewindMode, displayEvents])
 
   useEffect(() => {
     if (!rewindMode) return
@@ -302,17 +309,17 @@ export function EventStream() {
     }
   }, [rewindMode, syncTimelineFromScroll])
 
-  const prevFilteredRef = useRef(filteredEvents)
+  const prevFilteredRef = useRef(displayEvents)
   useEffect(() => {
-    if (selectedEventId != null && filteredEvents !== prevFilteredRef.current) {
-      const idx = filteredEvents.findIndex((e) => e.id === selectedEventId)
+    if (selectedEventId != null && displayEvents !== prevFilteredRef.current) {
+      const idx = displayEvents.findIndex((e) => e.id === selectedEventId)
       if (idx >= 0) {
         virtualizer.scrollToIndex(idx, { align: 'center' })
       }
     }
-    prevFilteredRef.current = filteredEvents
+    prevFilteredRef.current = displayEvents
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filteredEvents, selectedEventId])
+  }, [displayEvents, selectedEventId])
 
   // Scroll to a requested event — resolves grouped events (PostToolUse → displayed PreToolUse)
   const setFlashingEventId = useUIStore((s) => s.setFlashingEventId)
@@ -323,7 +330,7 @@ export function EventStream() {
     // Resolve merged event IDs: if the target event is hidden (displayEventStream=false),
     // find the displayed event in its group
     let resolvedId = scrollToEventId
-    const targetIdx = filteredEvents.findIndex((e) => e.id === scrollToEventId)
+    const targetIdx = displayEvents.findIndex((e) => e.id === scrollToEventId)
     if (targetIdx < 0) {
       // Not in filtered events — might be a hidden PostToolUse. Search enriched events.
       const hidden = enrichedEvents.find((e) => e.id === scrollToEventId)
@@ -334,7 +341,7 @@ export function EventStream() {
       }
     }
 
-    const idx = filteredEvents.findIndex((e) => e.id === resolvedId)
+    const idx = displayEvents.findIndex((e) => e.id === resolvedId)
     if (idx < 0) return
     virtualizer.scrollToIndex(idx, { align: 'center' })
     setFlashingEventId(resolvedId)
@@ -347,7 +354,7 @@ export function EventStream() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     scrollToEventId,
-    filteredEvents,
+    displayEvents,
     enrichedEvents,
     dataApi,
     setScrollToEventId,
@@ -413,7 +420,7 @@ export function EventStream() {
                 <TimestampTooltipProvider>
                   <div className="relative" style={{ height: `${totalSize}px`, width: '100%' }}>
                     {virtualItems.map((virtualItem) => {
-                      const event = filteredEvents[virtualItem.index]
+                      const event = displayEvents[virtualItem.index]
                       if (!event) return null
                       return (
                         <div
