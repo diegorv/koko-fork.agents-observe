@@ -27,7 +27,7 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
-  --text-xs: 0.92rem;
+  --text-xs: 0.85rem;
 }
 
 :root {
@@ -65,20 +65,20 @@
   --popover-foreground: oklch(0.985 0 0);
   --primary: oklch(0.985 0 0);
   --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
+  --secondary: #2e2f3d;
   --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
+  --muted: #2e2f3d;
   --muted-foreground: oklch(0.985 0 0);
-  --accent: oklch(0.269 0 0);
+  --accent: #33344a;
   --accent-foreground: oklch(0.985 0 0);
   --destructive: oklch(0.396 0.141 25.723);
   --destructive-foreground: oklch(0.637 0.237 25.331);
-  --border: oklch(0.269 0 0);
-  --input: oklch(0.269 0 0);
-  --ring: oklch(0.439 0 0);
+  --border: #3a3c4d;
+  --input: #3a3c4d;
+  --ring: #5a5c6d;
   --sidebar: #1d1e27;
   --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(0.269 0 0);
+  --sidebar-border: #2e2f3d;
 }
 
 @keyframes flash-ring {
