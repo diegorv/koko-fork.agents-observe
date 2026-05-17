@@ -74,7 +74,7 @@ export function AgentCombobox() {
   const selectedAgents = agents.filter((a) => selectedAgentIds.includes(a.id))
 
   return (
-    <div className="flex items-center gap-1.5 flex-wrap flex-1 min-w-0">
+    <div className="flex items-center gap-1.5 min-w-0 shrink-0">
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button

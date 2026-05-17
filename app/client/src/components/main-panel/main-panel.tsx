@@ -5,6 +5,7 @@ import { useSessions } from '@/hooks/use-sessions'
 import { EventProcessingProvider } from '@/agents/event-processing-context'
 import { SessionBreadcrumb } from './session-breadcrumb'
 import { ScopeBar } from './scope-bar'
+import { AgentCombobox } from './agent-combobox'
 import { EventFilterBar } from './event-filter-bar'
 import { ActivityTimeline } from '@/components/timeline/activity-timeline'
 import { EventStream } from '@/components/event-stream/event-stream'
@@ -48,8 +49,11 @@ function SessionView({ sessionId, projectId }: { sessionId: string; projectId: n
   return (
     <EventProcessingProvider rawEvents={rawEvents} agents={agents}>
       <div className="flex-1 flex flex-col overflow-hidden">
-        <SessionBreadcrumb />
-        <ScopeBar />
+        <div className="flex items-center gap-3 px-3 py-1 border-b border-border min-h-[40px]">
+          <AgentCombobox />
+          <SessionBreadcrumb />
+          <ScopeBar />
+        </div>
         <EventFilterBar />
         <ActivityTimeline />
         <EventStream key={sessionId} />

@@ -6,8 +6,7 @@ import { useEvents } from '@/hooks/use-events'
 import { CopyButton } from '@/components/shared/copy-button'
 
 export function SessionBreadcrumb() {
-  const { selectedSessionId, selectedProjectId, setSelectedSessionId, dedupEnabled, openSettings } =
-    useUIStore()
+  const { selectedSessionId, selectedProjectId, setSelectedSessionId } = useUIStore()
 
   const { data: session } = useQuery({
     queryKey: ['session', selectedSessionId],
@@ -30,7 +29,7 @@ export function SessionBreadcrumb() {
   const transcriptPath = session.transcriptPath || null
 
   return (
-    <div className="group/breadcrumb flex items-center gap-1.5 px-3 py-1 border-b border-border text-2xs text-muted-foreground/70 min-h-[28px]">
+    <div className="group/breadcrumb flex items-center gap-1.5 text-2xs text-muted-foreground/70 min-w-0 shrink">
       <button
         className="hover:text-foreground transition-colors cursor-pointer truncate max-w-[150px]"
         onClick={() => setSelectedSessionId(null)}
@@ -65,17 +64,6 @@ export function SessionBreadcrumb() {
           />
         </>
       )}
-      <button
-        className={`ml-auto rounded-full px-2 py-0.5 text-2xs border cursor-pointer transition-colors shrink-0 ${
-          dedupEnabled
-            ? 'border-border/50 text-muted-foreground/50 hover:border-border hover:text-muted-foreground'
-            : 'border-orange-500/50 text-orange-500 hover:border-orange-500 hover:text-orange-600'
-        }`}
-        onClick={() => openSettings('settings')}
-        title={dedupEnabled ? 'Event dedup is on' : 'Event dedup is off — showing raw events'}
-      >
-        {dedupEnabled ? 'Dedup Events' : 'Raw Events'}
-      </button>
     </div>
   )
 }
