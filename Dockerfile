@@ -16,8 +16,8 @@
 #   export AGENTS_OBSERVE_DOCKER_IMAGE=agents-observe:local
 
 # When updating Node, verify the new digest of the base image:
-#   docker pull node:22.11-slim && docker inspect --format='{{.Id}}' node:22.11-slim
-FROM node:22.11-slim AS builder
+#   docker pull node:24.10-slim && docker inspect --format='{{.Id}}' node:24.10-slim
+FROM node:24.10-slim AS builder
 
 WORKDIR /app
 
@@ -34,15 +34,20 @@ COPY app/server/tsconfig.json server/
 COPY app/server/src server/src
 
 # Client: install + build static SPA.
+# `--include=optional` is required because Vite 8 (rolldown bundler) ships
+# platform-specific bindings as optionalDependencies; npm has a long-standing
+# bug (npm/cli#4828) where `npm ci` can skip the binding for the build
+# platform when the lockfile was generated on a different host. Explicit
+# flag avoids "Cannot find native binding" at `vite build` time.
 COPY app/client/package.json app/client/package-lock.json client/
-RUN cd client && npm ci --no-audit --no-fund
+RUN cd client && npm ci --no-audit --no-fund --include=optional
 COPY app/client/ client/
 # vite.config.ts reads ../../package.json (resolves to /package.json inside image).
 COPY package.json /package.json
 RUN cd client && npm run build
 
 # ---------- Production image ----------
-FROM node:22.11-slim
+FROM node:24.10-slim
 
 WORKDIR /app
 
