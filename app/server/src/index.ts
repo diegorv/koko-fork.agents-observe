@@ -12,22 +12,30 @@ const PORT = config.port
 
 // Repair any rows with broken foreign keys before serving traffic.
 // Logs what it found so the user knows if state was unexpected.
-store.repairOrphans().then((result) => {
-  const total =
-    result.sessionsReassigned +
-    result.agentsDeleted +
-    result.agentsReparented +
-    result.eventsDeleted
-  if (total > 0) {
-    console.log(
-      `[startup] Repaired orphaned rows: ` +
-        `${result.sessionsReassigned} sessions reassigned to 'unknown', ` +
-        `${result.agentsDeleted} agents deleted, ` +
-        `${result.agentsReparented} agents reparented, ` +
-        `${result.eventsDeleted} events deleted`,
-    )
-  }
-})
+// A failure here means the DB is in an unknown state — exit rather than
+// serve traffic on top of it.
+store
+  .repairOrphans()
+  .then((result) => {
+    const total =
+      result.sessionsReassigned +
+      result.agentsDeleted +
+      result.agentsReparented +
+      result.eventsDeleted
+    if (total > 0) {
+      console.log(
+        `[startup] Repaired orphaned rows: ` +
+          `${result.sessionsReassigned} sessions reassigned to 'unknown', ` +
+          `${result.agentsDeleted} agents deleted, ` +
+          `${result.agentsReparented} agents reparented, ` +
+          `${result.eventsDeleted} events deleted`,
+      )
+    }
+  })
+  .catch((err) => {
+    console.error('[startup] repairOrphans failed — refusing to serve traffic:', err)
+    process.exit(1)
+  })
 
 const app = createApp(store, broadcastToSession, broadcastToAll, broadcastActivity)
 const HOST = config.bindHost
