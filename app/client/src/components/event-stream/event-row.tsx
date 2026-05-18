@@ -82,7 +82,7 @@ export const EventRow = memo(function EventRow({
     >
       <button
         className={cn(
-          'flex flex-col w-full text-left px-3 py-1.5 border-l-2 transition-colors hover:bg-accent/50 overflow-hidden cursor-pointer',
+          'relative flex items-center w-full text-left px-3 py-2 min-h-[44px] border-l-2 transition-colors hover:bg-accent/50 overflow-hidden cursor-pointer',
           isSubagent ? 'bg-muted/20' : '',
           isSelected
             ? 'border-l-primary bg-primary/[0.07] dark:bg-primary/[0.12]'
@@ -93,11 +93,13 @@ export const EventRow = memo(function EventRow({
           if (e.button === 1) e.preventDefault()
         }}
       >
-        {/* Agent label (framework-owned) */}
+        {/* Agent label (framework-owned). Floats over the top-left of
+            the row so it labels the row without pushing the main content
+            off the vertical center. */}
         {showAgentLabel && (
           <div
             className={cn(
-              'text-2xs opacity-90 dark:opacity-60 leading-tight',
+              'absolute top-0.5 left-3 text-2xs opacity-90 dark:opacity-60 leading-none pointer-events-none',
               agentColors.textOnly,
             )}
           >

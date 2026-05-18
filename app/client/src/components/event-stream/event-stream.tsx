@@ -201,7 +201,7 @@ export function EventStream() {
     getScrollElement: () => scrollRef.current,
     estimateSize: (index) => {
       const event = displayEvents[index]
-      return event && expandedEventIds.has(event.id) ? 200 : 36
+      return event && expandedEventIds.has(event.id) ? 200 : 40
     },
     overscan: 10,
     getItemKey: (index) => displayEvents[index]?.id ?? index,
@@ -431,7 +431,7 @@ export function EventStream() {
                           key={virtualItem.key}
                           ref={virtualizer.measureElement}
                           data-index={virtualItem.index}
-                          className="absolute top-0 left-0 w-full border-b border-border/50"
+                          className="absolute top-0 left-0 w-full border-b border-border"
                           style={{ transform: `translateY(${virtualItem.start}px)` }}
                         >
                           <EventRow
