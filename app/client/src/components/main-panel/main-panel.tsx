@@ -54,8 +54,8 @@ function SessionView({ sessionId, projectId }: { sessionId: string; projectId: n
           <SessionBreadcrumb />
           <ScopeBar />
         </div>
-        <EventFilterBar />
         <ActivityTimeline />
+        <EventFilterBar />
         <EventStream key={sessionId} />
       </div>
     </EventProcessingProvider>
