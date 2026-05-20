@@ -4,6 +4,7 @@
 import { CircleDot } from 'lucide-react'
 import { AgentRegistry } from '../registry'
 import { applyFilters } from '@/lib/filters/matcher'
+import { passesAllFilter } from '@/lib/filters/all-filter'
 import type {
   RawEvent,
   EnrichedEvent,
@@ -32,6 +33,9 @@ export function processEvent(raw: RawEvent, ctx: ProcessingContext): { event: En
   const toolName = deriveToolName(raw)
   const hookName = raw.hookName
 
+  // Gate visibility on the All filter's exclusions.
+  const passesAll = passesAllFilter(raw, toolName, ctx.compiledFilters)
+
   const enriched: EnrichedEvent = {
     id: raw.id,
     agentId: raw.agentId,
@@ -40,8 +44,8 @@ export function processEvent(raw: RawEvent, ctx: ProcessingContext): { event: En
     toolName,
     groupId: toolUseId,
     turnId,
-    displayEventStream: true,
-    displayTimeline: true,
+    displayEventStream: passesAll,
+    displayTimeline: passesAll,
     label: hookName || 'Event',
     labelTooltip: hookName,
     iconId: 'Default',
