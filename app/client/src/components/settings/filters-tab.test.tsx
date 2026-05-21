@@ -111,9 +111,7 @@ describe('FiltersTab — All filter', () => {
 
   test('shows the All-filter caption above the default-all row', () => {
     renderWithQuery(<FiltersTab />)
-    expect(
-      screen.getByText(/Hides events from the timeline and event stream/i),
-    ).toBeInTheDocument()
+    expect(screen.getByText(/Hides events from the timeline and event stream/i)).toBeInTheDocument()
   })
 
   test('hides Display, Combinator, and Color controls when editing default-all', () => {

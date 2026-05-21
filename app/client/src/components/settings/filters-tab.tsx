@@ -146,8 +146,8 @@ export function FiltersTab() {
                 <Fragment key={f.id}>
                   {f.id === ALL_FILTER_ID && (
                     <p className="px-2 py-1 text-[10px] text-muted-foreground italic">
-                      Hides events from the timeline and event stream. Excluded events still
-                      appear in raw logs.
+                      Hides events from the timeline and event stream. Excluded events still appear
+                      in raw logs.
                     </p>
                   )}
                   <Row
@@ -615,9 +615,7 @@ function FilterEditor({
                       onClick={() => setDraft({ combinator: c })}
                       className={cn(
                         'px-2 py-1',
-                        combinator === c
-                          ? 'bg-muted-foreground text-background'
-                          : 'bg-transparent',
+                        combinator === c ? 'bg-muted-foreground text-background' : 'bg-transparent',
                       )}
                     >
                       {c.toUpperCase()}

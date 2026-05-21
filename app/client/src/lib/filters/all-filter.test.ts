@@ -65,13 +65,9 @@ describe('passesAllFilter', () => {
       },
     ])
     expect(passesAllFilter(POST_TOOL_BATCH_RAW, null, compiled)).toBe(false)
-    expect(
-      passesAllFilter(
-        { ...PRE_TOOL_USE_RAW, hookName: 'Notification' },
-        null,
-        compiled,
-      ),
-    ).toBe(false)
+    expect(passesAllFilter({ ...PRE_TOOL_USE_RAW, hookName: 'Notification' }, null, compiled)).toBe(
+      false,
+    )
     expect(passesAllFilter(PRE_TOOL_USE_RAW, 'Bash', compiled)).toBe(true)
   })
 })
