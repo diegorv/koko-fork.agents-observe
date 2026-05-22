@@ -228,4 +228,79 @@ export const api = {
   duplicateFilter: (id: string) =>
     fetchJson<Filter>(`/filters/${encodeURIComponent(id)}/duplicate`, { method: 'POST' }),
   resetDefaultFilters: () => fetchJson<Filter[]>(`/filters/defaults/reset`, { method: 'POST' }),
+  // Unlike other api.* methods which throw ApiError on non-2xx, this
+  // endpoint returns a discriminated-union response. The UI maps each
+  // `error` code to a distinct user-facing message; treating these as
+  // exceptions would lose that information.
+  getTranscriptStats: async (sessionId: string): Promise<TranscriptStatsResponse> => {
+    const res = await fetch(
+      `${API_BASE}/sessions/${encodeURIComponent(sessionId)}/transcript-stats`,
+    )
+    const body = await res.json().catch(() => ({}))
+    if (!res.ok) {
+      return {
+        ok: false,
+        status: res.status,
+        error: (body.error as TranscriptStatsErrorCode) ?? 'unknown',
+        message: body.message ?? 'Unknown error',
+      }
+    }
+    return { ok: true, status: 200, data: body as TranscriptStatsData }
+  },
 }
+
+// ── Transcript stats types ────────────────────────────────────────
+
+export interface TranscriptStatsUsage {
+  inputTokens: number
+  outputTokens: number
+  cacheReadTokens: number
+  cacheCreate5mTokens: number
+  cacheCreate1hTokens: number
+}
+
+export interface TranscriptStatsByModel extends TranscriptStatsUsage {
+  model: string
+  calls: number
+}
+
+export interface TranscriptStatsCall {
+  messageId: string
+  requestId: string | null
+  timestamp: number
+  model: string
+  isSidechain: boolean
+  serviceTier: string | null
+  stopReason: string | null
+  usage: TranscriptStatsUsage
+  toolUseIds: string[]
+  promptId: string | null
+}
+
+export interface TranscriptStatsData {
+  source: 'jsonl'
+  summary: {
+    totalCalls: number
+    byModel: TranscriptStatsByModel[]
+  }
+  calls: TranscriptStatsCall[]
+  prompts: Record<string, { text: string; timestamp: number }>
+}
+
+export type TranscriptStatsErrorCode =
+  | 'disabled'
+  | 'no_transcript'
+  | 'file_not_found'
+  | 'file_unreadable'
+  | 'file_too_large'
+  | 'parse_error'
+  | 'unknown'
+
+export type TranscriptStatsResponse =
+  | { ok: true; status: 200; data: TranscriptStatsData }
+  | {
+      ok: false
+      status: number
+      error: TranscriptStatsErrorCode
+      message: string
+    }
