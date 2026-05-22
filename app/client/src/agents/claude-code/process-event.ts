@@ -5,6 +5,7 @@ import { getEventSummary, buildSearchText } from './helpers'
 import { deriveToolName } from './derivers'
 import { agentPatchDebouncer } from '@/lib/agent-patch-debouncer'
 import { applyFilters } from '@/lib/filters/matcher'
+import { passesAllFilter } from '@/lib/filters/all-filter'
 
 /** Map (hookName, toolName) → registry icon id. Tool icons are prefixed
  *  `Tool` to disambiguate from hookName-shaped ids. */
@@ -350,6 +351,10 @@ export function processEvent(
   const rawSummary = getEventSummary(raw, hookName, toolName)
   const slots = computeSlots(hookName, toolName, rawSummary, raw.payload)
 
+  // Gate visibility on the All filter's exclusions. Events that fail
+  // are still added to the store, but suppressed from both views.
+  const passesAll = passesAllFilter(raw, toolName, ctx.compiledFilters)
+
   const enriched: ClaudeCodeEnrichedEvent = {
     // Identity
     id: raw.id,
@@ -361,8 +366,8 @@ export function processEvent(
     toolName,
     groupId,
     turnId,
-    displayEventStream,
-    displayTimeline,
+    displayEventStream: passesAll && displayEventStream,
+    displayTimeline: passesAll && displayTimeline,
     label: LABELS[hookName] || hookName || 'Event',
     labelTooltip: hookName,
     iconId,
