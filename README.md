@@ -1,8 +1,8 @@
 # Agents Observe
 
-Real-time observability dashboard for Claude Code agents.
+Real-time observability dashboard for Claude Code and Codex agents.
 
-Includes powerful filtering, searching, and visualization of multi-agent sessions.
+Includes powerful filtering, searching, and visualization of multi-agent sessions with full replay and token usage stats.
 
 <p align="center">
   <a href="https://raw.githubusercontent.com/simple10/agents-observe/videos/docs/assets/dashboard.gif">
@@ -16,6 +16,12 @@ Includes powerful filtering, searching, and visualization of multi-agent session
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/simple10/agents-observe/main/docs/assets/dashboard2.png" alt="Agents Observe Dashboard Screenshot - Expanded Row" />
+</p>
+
+> Version 0.9.7 adds token usage and cost breakdowns in session stats.
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/simple10/agents-observe/main/docs/assets/session-token-usage1.png" alt="Agents Observe Session Token Usage" />
 </p>
 
 ## Quick Start
