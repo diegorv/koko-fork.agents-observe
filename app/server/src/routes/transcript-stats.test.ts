@@ -22,7 +22,13 @@ import transcriptStatsRouter from './transcript-stats'
 function makeApp(store: Partial<EventStore>) {
   const app = new Hono<{ Variables: { store: EventStore } }>()
   app.use('*', async (c, next) => {
-    c.set('store', store as EventStore)
+    // Default getAgentsForSession to empty so non-200 paths still satisfy
+    // the route's call signature when individual tests don't override it.
+    const merged = {
+      getAgentsForSession: async () => [] as any,
+      ...store,
+    } as EventStore
+    c.set('store', merged)
     await next()
   })
   app.route('/api', transcriptStatsRouter)
@@ -74,21 +80,43 @@ describe('GET /api/sessions/:sessionId/transcript-stats', () => {
     transcriptConfig.hostBase = ''
     transcriptConfig.containerBase = ''
     transcriptConfig.maxFileBytes = 100 * 1024 * 1024
+    // Mock models.dev fetch so pricing resolves deterministically.
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({
+          anthropic: {
+            models: {
+              'claude-opus-4-7': {
+                id: 'claude-opus-4-7',
+                cost: { input: 15, output: 75, cache_read: 1.5, cache_write: 18.75 },
+              },
+            },
+          },
+        }),
+      }),
+    )
   })
 
-  test('returns 200 with parsed stats when transcript exists', async () => {
+  test('returns 200 with parsed V2 stats when transcript exists', async () => {
     const path = writeFixture()
     const app = makeApp({
       getSessionTranscriptPath: async () => path,
+      getAgentsForSession: async () =>
+        [{ id: 'sess1', agent_class: 'claude-code' }] as any,
     })
     const res = await app.request('/api/sessions/sess1/transcript-stats')
     expect(res.status).toBe(200)
     const body = await res.json()
     expect(body.source).toBe('jsonl')
     expect(body.summary.totalCalls).toBe(1)
-    expect(body.calls).toHaveLength(1)
-    expect(body.calls[0].model).toBe('claude-opus-4-7')
-    expect(body.prompts.p1.text).toBe('hi')
+    expect(body.byModel).toHaveLength(1)
+    expect(body.byModel[0].model).toBe('claude-opus-4-7')
+    expect(body.prompts).toBeInstanceOf(Array)
+    expect(body.subagents).toBeInstanceOf(Array)
+    expect(body.models).toBeDefined()
+    expect(body.errors).toBeInstanceOf(Array)
   })
 
   test('returns 404 disabled when feature flag is off', async () => {
@@ -153,8 +181,8 @@ describe('GET /api/sessions/:sessionId/transcript-stats', () => {
 
   test('returns 500 parse_error when the parser throws', async () => {
     const path = writeFixture()
-    vi.doMock('../services/transcript-parser', () => ({
-      parseTranscriptFile: async () => {
+    vi.doMock('../transcript-parser', () => ({
+      parseSessionTranscripts: async () => {
         throw new Error('boom')
       },
     }))
@@ -162,7 +190,13 @@ describe('GET /api/sessions/:sessionId/transcript-stats', () => {
     const reloaded = (await import('./transcript-stats')).default
     const app = new Hono<{ Variables: { store: EventStore } }>()
     app.use('*', async (c, next) => {
-      c.set('store', { getSessionTranscriptPath: async () => path } as unknown as EventStore)
+      c.set(
+        'store',
+        {
+          getSessionTranscriptPath: async () => path,
+          getAgentsForSession: async () => [],
+        } as unknown as EventStore,
+      )
       await next()
     })
     app.route('/api', reloaded)
@@ -171,6 +205,6 @@ describe('GET /api/sessions/:sessionId/transcript-stats', () => {
     const body = await res.json()
     expect(body.error).toBe('parse_error')
     expect(body.message).toContain('boom')
-    vi.doUnmock('../services/transcript-parser')
+    vi.doUnmock('../transcript-parser')
   })
 })

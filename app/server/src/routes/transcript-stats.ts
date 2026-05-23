@@ -3,7 +3,7 @@ import { promises as fs } from 'node:fs'
 import type { EventStore } from '../storage/types'
 import { config } from '../config'
 import { resolveTranscriptPath } from '../services/transcript-path'
-import { parseTranscriptFile } from '../services/transcript-parser'
+import { parseSessionTranscripts } from '../transcript-parser'
 
 type Env = { Variables: { store: EventStore } }
 
@@ -66,7 +66,7 @@ router.get('/sessions/:sessionId/transcript-stats', async (c) => {
   }
 
   try {
-    const stats = await parseTranscriptFile(resolved)
+    const stats = await parseSessionTranscripts(sessionId, store, resolved)
     return c.json(stats, 200)
   } catch (err: any) {
     if (err?.code === 'EACCES') {
