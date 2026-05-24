@@ -201,7 +201,7 @@ export function SessionEditModal() {
       >
         <DialogContent
           aria-describedby={undefined}
-          className="w-[1100px] max-w-[95vw] max-h-[85vh] flex flex-col p-0"
+          className="w-[1200px] max-w-[95vw] max-h-[85vh] flex flex-col p-0"
         >
           {/* Header: session name + actions */}
           <div className="flex items-center gap-3 px-5 pt-5 pb-1">

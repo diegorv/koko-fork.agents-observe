@@ -325,6 +325,11 @@ export function TokenUsageSection({
 
   const agentColorMap = useMemo(() => buildAgentColorMap(agents), [agents])
 
+  // Frozen "now" reference for the prompts "Date" column. Captured at
+  // mount so the relative-time labels don't tick under the user's
+  // cursor — the stats panel is a snapshot, not a live view.
+  const nowRef = useMemo(() => Date.now(), [])
+
   // Transcript stats are an *augmentation* layer. The Agents table
   // always renders from event data; transcripts add Model + Est Cost
   // columns and the per-prompt/per-model tables when available.
@@ -491,6 +496,18 @@ export function TokenUsageSection({
               sortValue: (r) => r.text,
             },
             {
+              key: 'date',
+              label: 'Date',
+              sortType: 'number',
+              align: 'right',
+              // Display is "<elapsed> ago" frozen at panel-mount time; sort
+              // key is the raw timestamp so newest-first / oldest-first
+              // ordering works regardless of display formatting.
+              render: (r) => fmtMs(nowRef - r.timestamp),
+              sortValue: (r) => r.timestamp,
+              className: 'whitespace-nowrap',
+            },
+            {
               key: 'duration',
               label: 'Duration',
               sortType: 'number',
@@ -569,7 +586,7 @@ export function TokenUsageSection({
             },
           ]
         : [],
-    [transcript, eventPromptTexts, onPromptClick],
+    [transcript, eventPromptTexts, onPromptClick, nowRef],
   )
 
   const promptTotals = useMemo(
@@ -839,6 +856,7 @@ export function TokenUsageSection({
                       ({transcript.prompts.length})
                     </span>
                   </span>,
+                  null, // Date column has no meaningful total
                   fmtMs(promptTotals.durationMs),
                   fmt(promptTotals.toolCount),
                   fmt(promptTotals.requests),
