@@ -15,6 +15,8 @@ Restart Claude Code. The server auto-starts as a Docker container and the dashbo
 
 | Command | Description |
 |---------|-------------|
+| `/observe view` | Open the current session in the dashboard |
+| `/observe stats` | Open the current session's stats modal |
 | `/observe` | Open the dashboard |
 | `/observe status` | Server health and config |
 | `/observe start` | Start the server |

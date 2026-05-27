@@ -7,7 +7,7 @@
 >
 > See [What this fork changes](#what-this-fork-changes) for the full diff vs upstream.
 
-Real-time observability dashboard for Claude Code agents. Includes powerful filtering, searching, and visualization of multi-agent sessions.
+Real-time observability dashboard for Claude Code and Codex agents. Includes powerful filtering, searching, and visualization of multi-agent sessions with full replay and token usage stats.
 
 <p align="center">
   <a href="https://raw.githubusercontent.com/simple10/agents-observe/videos/docs/assets/dashboard.gif">
@@ -21,6 +21,12 @@ Real-time observability dashboard for Claude Code agents. Includes powerful filt
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/simple10/agents-observe/main/docs/assets/dashboard2.png" alt="Dashboard screenshot (asset hosted by the upstream project)" />
+</p>
+
+> Version 0.9.7 adds token usage and cost breakdowns in session stats.
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/simple10/agents-observe/main/docs/assets/session-token-usage1.png" alt="Agents Observe Session Token Usage" />
 </p>
 
 ## What this fork changes
@@ -84,12 +90,53 @@ Add the `export` line to your shell profile, or on macOS set it for GUI apps wit
 launchctl setenv AGENTS_OBSERVE_DOCKER_IMAGE agents-observe:local
 ```
 
-### Prerequisites
+## IMPORTANT: Upgrading & Pinning Location of the DB
 
-- [Docker](https://www.docker.com/) (required — the server runs as a container)
-- [Node.js](https://nodejs.org/) (required — hook scripts run via `node`)
+> When installed as a claude plugin, Agents Observe currently stores the sqlite db in the same dir
+> where the plugin is installed. Upgrading the plugin will effectively create a new db instead
+> of re-using the previous one. This will be fixed in the next version.
 
-If docker or node are not installed on your host, the plugin will fail to properly load.
+In the meantime, it's highly recommended to pin the location of the db by setting
+`AGENTS_OBSERVE_DATA_DIR` env var in your main `~/.claude/settings.json`.
+
+You can set it to whatever dir you want.
+
+Before upgrading the plugin:
+
+1. Stop the server with `/observe stop` in a claude session or use docker cli
+2. Move the db to whatever permanent location you want
+3. Add `AGENTS_OBSERVE_DATA_DIR` env var to your root `~/.claude/settings.json` to pin the location
+
+```bash
+# Example moving the db to a permanent location
+
+mkdir -p ~/.claude/plugins/data/agents-observe/data
+
+# Note: change the version (0.9.6) to whatever version you've installed
+mv ~/.claude/plugins/cache/agents-observe/agents-observe/0.9.6/data/data ~/.claude/plugins/data/agents-observe
+
+# Open claude settings.json in an editor
+edit ~/.claude/settings.json
+```
+
+Set AGENTS_OBSERVE_DATA_DIR env var in `~/.claude/settings.json`
+
+```jsonc
+  // ~/.claude/settings.json
+  "env": {
+    "AGENTS_OBSERVE_DATA_DIR": "~/.claude/plugins/data/agents-observe/data"
+  },
+```
+
+---
+
+## Prerequisites
+
+- [Docker](https://www.docker.com/) — the server runs as a container
+- [Node.js](https://nodejs.org/) — hook scripts run via `node`
+- Bash - hooks are configured to use `hooks.sh` for fast fire and forget event logging
+
+If docker, node, or bash are not installed on your host, the plugin will fail to properly load.
 
 Use the `/observe debug` claude command to help troubleshoot and fix installation issues.
 
@@ -97,11 +144,13 @@ Use the `/observe debug` claude command to help troubleshoot and fix installatio
 
 | Skill | Description |
 |-------|-------------|
+| `/observe view` | Open the current session in the dashboard |
+| `/observe stats` | Open the current session's stats modal in the dashboard |
 | `/observe` | Open the dashboard URL and check if the server is running |
 | `/observe status` | Show server health, version, runtime, and config details |
 | `/observe start` | Start the server |
 | `/observe stop` | Stop the server |
-| `/observe restart` | Restart the server |
+| `/observe restart` | Restart the MCP server |
 | `/observe logs` | Show recent Docker container logs |
 | `/observe debug` | Diagnose server issues (health, docker logs, mcp.log, cli.log) |
 

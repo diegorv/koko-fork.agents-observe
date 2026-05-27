@@ -55,6 +55,55 @@ Focused on backend robustness with defensive fixes across the API server, WebSoc
 - Docs: add `docs/audit-report.html`, a self-contained static report of the read-only audit that produced this release.
 - Tests: 23 new tests across server, client, and scripts (now 802 total) covering the helpers and regression cases for every fix above.
 
+## v0.9.8 — Improvements to session transcript stats
+
+This release improves the accuracy of transcript file scanning for session Stats view.
+The session stats now work properly even when the session events were not captured.
+Transcript files are treated as authoritative when available with fallbacks to events parsing.
+
+### Features
+
+- Session stats and `/observe stats` now works for sessions where the plugin was not previously enabled.
+- Added a Date column to the prompts table for sorting.
+- Zero-call prompts now appear in the prompts table, styled muted.
+- Prompts card now shows a discrepancy indicator when transcript prompts count differs from events count.
+- Claude subagents are now included in stats even when subagent events were not captured.
+
+### Fixes
+
+- Prompt counting now keys off the user-line UUID and filters injected entries, eliminating duplicate and miscounted prompts.
+- Subagents are now discovered via a filesystem scan instead of a DB lookup, so they show up reliably.
+- Transcript cost math now skips claude's `<synthetic>` assistant messages, previously breaking Est. Cost calculations.
+- Memoized derived data in the stats panel for better performance.
+
+## v0.9.7 — Session transcript token stats and richer Stats tab
+
+This release introduces a major improvement in the session Stats view. Transcript-based token usage analytics with per-model breakdowns, subagent tracking, and canonical pricing. Requires the server to have read access to claude and codex transcript files. Now enabled by default.
+
+### Features
+
+- New Token Usage section in the Stats tab with per-model summaries, cost breakdowns, and fallback to events when transcripts are disabled
+- New prompts token usage in session Stats - clickable link auto scrolls to the prompt event
+- Cost breakdown tooltips on prompts and Est Cost cells with improved tooltip layout
+- Longest tool call now renders as a clickable link to its PreToolUse event
+- Codex transcript support with expanded test coverage
+- Event deduplication at `/events` ingestion via canonical-JSON signature hashing and a UNIQUE `signature_hash` column
+- `AskUserQuestion` event details now render the question, options, and answer
+- New `/observe view` and `/observe stats` skill commands open the browser to the current session
+- `AGENTS_OBSERVE_TRANSCRIPT_STATS` flag enabled by default, with Docker bind mount for `~/.claude/projects` and `~/.codex/sessions`
+- "All" filter exclusions: seed default-all filter hides `PostToolBatch`, gates Claude Code and default-agent events, and backfills missing seed filters on existing installs
+
+### Fixes
+
+- Filter out subagents with zero LLM activity from stats
+- Include subagents without transcript JSONLs as stub rows
+- Miscellaneous Stats tab revamp fixes
+
+### Other
+
+- Documentation: added session token usage image to README, plus design specs and implementation plans for transcript token stats, event deduplication, UI revamp, and All filter exclusions
+- Chore: simplified Codex hooks env, removed old Claude Observe references, added transcript-stats setting to Claude config, applied formatter
+
 ## v0.9.6 — Hook path fix and test isolation
 
 This release fixes the UserPromptExpansion hook so it resolves correctly from the plugin root, and hardens the config test suite so it no longer depends on a real plugin install.

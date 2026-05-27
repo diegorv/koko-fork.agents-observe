@@ -11,6 +11,7 @@ import type {
   StoredEvent,
   OrphanRepairResult,
 } from './types'
+import { DuplicateEventSignatureError } from './types'
 import type { Filter, FilterRow, FilterPattern } from '../types'
 import { randomUUID } from 'node:crypto'
 import { SEED_FILTERS } from './seed-filters'
@@ -367,6 +368,17 @@ export class SqliteAdapter implements EventStore {
       `)
     }
 
+    // Additive migration: signature_hash column for event dedup. Existing
+    // rows stay NULL (SQLite treats NULLs as distinct under UNIQUE, so they
+    // don't collide). Re-read columns since the rebuild above may have
+    // replaced the table.
+    const postRebuildCols = this.db.prepare("PRAGMA table_info('events')").all() as {
+      name: string
+    }[]
+    if (!postRebuildCols.some((c) => c.name === 'signature_hash')) {
+      this.db.exec('ALTER TABLE events ADD COLUMN signature_hash TEXT')
+    }
+
     // First-boot setup for the filters table. We don't have any users
     // in the wild with a partial filters schema yet (this branch hasn't
     // shipped), so the install path is intentionally one-shot: create
@@ -400,6 +412,11 @@ export class SqliteAdapter implements EventStore {
         )
       `)
       this.runSeedDefaults()
+    } else {
+      // Existing installations: backfill seeds added in newer releases.
+      // Purely additive — never updates an existing row, so user
+      // customizations to defaults are preserved.
+      this.installMissingSeedDefaults()
     }
 
     // Create indexes
@@ -419,6 +436,9 @@ export class SqliteAdapter implements EventStore {
     this.db.exec('CREATE INDEX IF NOT EXISTS idx_events_agent_ts ON events(agent_id, timestamp)')
     this.db.exec(
       'CREATE INDEX IF NOT EXISTS idx_events_session_hook ON events(session_id, hook_name)',
+    )
+    this.db.exec(
+      'CREATE UNIQUE INDEX IF NOT EXISTS idx_events_signature_hash ON events(signature_hash)',
     )
     this.db.exec('CREATE INDEX IF NOT EXISTS idx_sessions_project ON sessions(project_id)')
     this.db.exec('CREATE INDEX IF NOT EXISTS idx_sessions_start_cwd ON sessions(start_cwd)')
@@ -721,23 +741,37 @@ export class SqliteAdapter implements EventStore {
 
   async insertEvent(params: InsertEventParams): Promise<InsertEventResult> {
     const now = Date.now()
-    const result = this.db
-      .prepare(
-        `
-      INSERT INTO events (agent_id, session_id, hook_name, timestamp, created_at, cwd, _meta, payload)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    let result
+    try {
+      result = this.db
+        .prepare(
+          `
+      INSERT INTO events (agent_id, session_id, hook_name, timestamp, created_at, cwd, _meta, payload, signature_hash)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     `,
-      )
-      .run(
-        params.agentId,
-        params.sessionId,
-        params.hookName ?? 'unknown',
-        params.timestamp,
-        now,
-        params.cwd ?? null,
-        params._meta != null ? JSON.stringify(params._meta) : null,
-        JSON.stringify(params.payload),
-      )
+        )
+        .run(
+          params.agentId,
+          params.sessionId,
+          params.hookName ?? 'unknown',
+          params.timestamp,
+          now,
+          params.cwd ?? null,
+          params._meta != null ? JSON.stringify(params._meta) : null,
+          JSON.stringify(params.payload),
+          params.signatureHash ?? null,
+        )
+    } catch (err: unknown) {
+      const e = err as { code?: string; message?: string }
+      if (
+        params.signatureHash &&
+        e?.code === 'SQLITE_CONSTRAINT_UNIQUE' &&
+        String(e.message ?? '').includes('events.signature_hash')
+      ) {
+        throw new DuplicateEventSignatureError(params.signatureHash)
+      }
+      throw err
+    }
 
     // Bump session activity so the dashboard knows the session is live.
     // Notification state transitions are owned by the route layer
@@ -753,6 +787,13 @@ export class SqliteAdapter implements EventStore {
       .run(params.timestamp, params.sessionId)
 
     return { eventId: Number(result.lastInsertRowid) }
+  }
+
+  async findEventBySignatureHash(hash: string): Promise<{ id: number } | null> {
+    const row = this.db
+      .prepare('SELECT id FROM events WHERE signature_hash = ? LIMIT 1')
+      .get(hash) as { id: number } | undefined
+    return row ? { id: Number(row.id) } : null
   }
 
   async getSessionsWithPendingNotifications(sinceTs: number): Promise<any[]> {
@@ -836,6 +877,13 @@ export class SqliteAdapter implements EventStore {
         )
         .get(sessionId) || null
     )
+  }
+
+  async getSessionTranscriptPath(sessionId: string): Promise<string | null> {
+    const row = this.db
+      .prepare(`SELECT transcript_path FROM sessions WHERE id = ?`)
+      .get(sessionId) as { transcript_path: string | null } | undefined
+    return row?.transcript_path ?? null
   }
 
   async getAgentById(agentId: string): Promise<any | null> {
@@ -987,6 +1035,35 @@ export class SqliteAdapter implements EventStore {
 
   async seedDefaultFilters(): Promise<void> {
     this.runSeedDefaults()
+  }
+
+  // Insert any SEED_FILTERS rows whose id isn't already in the filters
+  // table. Used during init on existing installs so a new release that
+  // adds a default (e.g. `default-all`) lands without disturbing rows
+  // the user has already customized. Never updates existing rows.
+  private installMissingSeedDefaults(): void {
+    const insert = this.db.prepare(
+      `INSERT OR IGNORE INTO filters
+       (id, name, pill_name, display, combinator, patterns, kind, enabled, config, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, 'default', 1, ?, ?, ?)`,
+    )
+    const now = Date.now()
+    const tx = this.db.transaction(() => {
+      for (const s of SEED_FILTERS) {
+        insert.run(
+          s.id,
+          s.name,
+          s.pillName,
+          s.display,
+          s.combinator,
+          JSON.stringify(s.patterns),
+          JSON.stringify(s.config ?? {}),
+          now,
+          now,
+        )
+      }
+    })
+    tx()
   }
 
   async resetDefaultFilters(): Promise<Filter[]> {
