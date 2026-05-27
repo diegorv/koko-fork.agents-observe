@@ -1,8 +1,5 @@
 # Changelog
 
-Here's the entry:
-
-```markdown
 ## v1.1.0 — Hardened, polished, and fully audited
 
 First minor release of the fork. Server hardened against corrupt data and unsafe defaults, Docker locked to loopback-only networking, dashboard redesigned for readability, and every direct dependency brought to current latest. Includes a full end-to-end security audit with all P0 findings resolved.
@@ -33,7 +30,6 @@ First minor release of the fork. Server hardened against corrupt data and unsafe
 - CI: Dependabot configured for npm/Docker/GitHub Actions, plus test and security workflows on push to main
 - Docs: added audit report, database-location pinning instructions, and local testing workflows in DEVELOPMENT.md
 - Fork rebranded: Dockerfile hardened, default image registry pointed at fork, README updated with attribution
-```
 
 ## v1.0.3 — Longer default auto-shutdown
 
