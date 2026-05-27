@@ -1,5 +1,40 @@
 # Changelog
 
+Here's the entry:
+
+```markdown
+## v1.1.0 — Hardened, polished, and fully audited
+
+First minor release of the fork. Server hardened against corrupt data and unsafe defaults, Docker locked to loopback-only networking, dashboard redesigned for readability, and every direct dependency brought to current latest. Includes a full end-to-end security audit with all P0 findings resolved.
+
+### Features
+
+- HTTP server binds to loopback (127.0.0.1) by default — no longer reachable from other machines on the network
+- Docker container publishes ports to localhost only and reuses a locally-built image when available
+- Event stream renders newest-first; auto-follow pins the latest event to the top row
+- New visitors open the dashboard in light mode by default (explicit theme choice still respected)
+- Dedicated event search component anchored next to the event count and time-range readout
+- Server stays alive for 30 minutes after the last consumer disconnects (up from 30 seconds), eliminating cold restarts during short context-switches
+
+### Fixes
+
+- Validate and cap `parseInt` query params on `/sessions` endpoints; invalid or out-of-range values return 400 instead of reaching SQLite
+- Tolerate corrupt JSON in event rows — a single bad row no longer crashes the list endpoint
+- Build admin backup paths safely so the live DB can never be overwritten by its own backup
+- Log malformed WebSocket JSON instead of silently swallowing parse failures
+- Exit cleanly when `repairOrphans` rejects at startup instead of serving on an unrepaired database
+- Guard `hook.sh` against missing `node`; failures now log to `~/.claude/logs/observe-hook.log`
+- Docker base image bumped to Node 24.10 with forced optional-deps install to fix container builds
+
+### Other
+
+- Dashboard UX overhaul: rebuilt session header into a single row, improved dark-theme contrast, consolidated ~115 ad-hoc font-size utilities into two design tokens (`text-2xs`, `text-xs`), and added vertical centering and breathing room to event rows and the filter bar
+- Dependency refresh across root, server, and client — major bumps include Vite 6→8, TypeScript 5→6, Vitest 3→4, React 19.0→19.2, Tailwind CSS 4.0→4.3, Hono 4.12.9→4.12.23, and all Radix UI primitives to current latest
+- CI: Dependabot configured for npm/Docker/GitHub Actions, plus test and security workflows on push to main
+- Docs: added audit report, database-location pinning instructions, and local testing workflows in DEVELOPMENT.md
+- Fork rebranded: Dockerfile hardened, default image registry pointed at fork, README updated with attribution
+```
+
 ## v1.0.3 — Longer default auto-shutdown
 
 Server now stays alive for 30 minutes after the last consumer or browser tab disconnects, up from 30 seconds. Short context-switches and idle browser tabs no longer trip the shutdown timer and force a cold restart the next time the dashboard is opened.
